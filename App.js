@@ -12,30 +12,25 @@ import MainScreen from './src/screens/MainScreen';
 import QuizScreen from './src/screens/QuizScreen';
 
 
-const DATA = [
-  {name: 'Lipa', text: 'popularni strom'},
-  {name: 'Lipa', text: 'popularni strom'},
-  {name: 'Lipa', text: 'popularni strom'},
-  {name: 'Lipa', text: 'popularni strom'}
-]
-
-
-
 export default class App extends React.Component {
   render() {
     const MainNavigator = createBottomTabNavigator({
       auth: {screen: AuthScreen},
       main: createBottomTabNavigator({
-        main: {screen: MainScreen},
+        main: createStackNavigator({
+          main: {screen: MainScreen},
+          detail: {screen: DetailScreen},
+          filter: {screen: FilterScreen},
+          add: {screen: AddScreen}
+        }),
         quiz: {screen: QuizScreen}
       })
     });
 
     return (
       <View style={styles.container}>
-        <StatusBar 
-          barStyle='light-content'/>
-        <MainNavigator/>
+        {/* <MainNavigator/> */}
+        <AddScreen/>
       </View>
     );
   }

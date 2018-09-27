@@ -11,10 +11,10 @@ import SearchInput from '../components/SearchInput';
 
 // MOCK DATA
 const MARKERS = [
-  {id: 1, latlng: {latitude: 37.78825, longitude: -122.4324 }, title: 'Title', description: 'description'},
-  {id: 2, latlng: {latitude: 37.78825, longitude: -122.5324 }, title: 'Title', description: 'description'},
-  {id: 3, latlng: {latitude: 37.78825, longitude: -122.6324 }, title: 'Title', description: 'description'},
-  {id: 4, latlng: {latitude: 37.78825, longitude: -122.7324 }, title: 'Title', description: 'description'}
+  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459783 }, title: 'Title', description: 'description'},
+  {id: 2, latlng: {latitude: 50.1300886, longitude: 14.459783 }, title: 'Title', description: 'description'},
+  {id: 3, latlng: {latitude: 50.1400886, longitude: 14.459783 }, title: 'Title', description: 'description'},
+  {id: 4, latlng: {latitude: 50.1500886, longitude: 14.459783 }, title: 'Title', description: 'description'}
 ];
 
 class MainScreen extends Component {
@@ -22,12 +22,17 @@ class MainScreen extends Component {
    * Static property set up the react-navigation component.
    * This screen use TabNavigator.
    */
+  // static navigationOptions = {
+  //   title: 'Mapa',
+  //   tabBarIcon: ({tintColor}) => {
+  //     return <Icon name='my-location' size={27} color={tintColor}/>
+  //   }
+  // };
+
   static navigationOptions = {
-    title: 'Mapa',
-    tabBarIcon: ({tintColor}) => {
-      return <Icon name='my-location' size={27} color={tintColor}/>
-    }
-  };
+    header: null,
+    title: 'Mapa'
+  }
 
   constructor(props) {
     super(props);
@@ -58,13 +63,8 @@ class MainScreen extends Component {
    */
   componentDidMount() {
     this.setState({mapLoaded: true});
-    this.fetchData();
   }
 
-  fetchData = async () => {
-    let {data} = await axios.get('http://removeazure.azurewebsites.net/api/values');
-    console.log(data);
-  }
 
   /**
    * The callback method. The method is called after the user changes 
@@ -89,8 +89,13 @@ class MainScreen extends Component {
     // }
   }
 
+  _handleCalloutPress = () => {
+    this.props.navigation.navigate('detail');
+  }
+
   _setInitialRegion = () => {
     let { latitude, longitude } = this.state.location;
+    console.log(this.state.location);
     let region = {
       latitude: latitude,
       longitude: longitude,
@@ -117,7 +122,7 @@ class MainScreen extends Component {
    * the SearchInput, then the app navigates to the FilterScreen.
    */
   _handleSerchInputPress = () => {
-    this.props.navigation.navigate('detail');
+    this.props.navigation.navigate('filter');
   }
 
   /**
@@ -127,18 +132,30 @@ class MainScreen extends Component {
   _handleFabItemPress = name => {
     switch(name) {
       case fab.FAB_ACTION_ADD:
-        console.log('add');
+        this._handleFabItemAddPress();
         break;
       case fab.FAB_ACTION_MYPOSITION:
-        console.log('myposition');
+        this._handleFabItemMyPositionPress();
         break;
       case fab.FAB_ACTION_NEAREST:
-        console.log('nearest');
+        this._handleFabItemNearestPress();
         break;
       default:
         console.error('None fab item selected');
         break;
     }
+  }
+
+  _handleFabItemAddPress = () => {
+    this.props.navigation.navigate('add');
+  }
+
+  _handleFabItemMyPositionPress = () => {
+    console.log('My positon button press');
+  }
+
+  _handleFabItemNearestPress = () => {
+    console.log('Nearest button press');
   }
 
   /**
@@ -177,7 +194,8 @@ class MainScreen extends Component {
           showsUserLocation
           folowUsersLocation
           onMapReady={this.onMapReady}
-          onRegionChangeComplete={this.onRegionChangeComplete}>
+          onRegionChangeComplete={this.onRegionChangeComplete}
+          onCalloutPress={this._handleCalloutPress} >
           {this._renderMarkers(MARKERS)}
         </MapView>
         <View style={styles.overlayMapStyle}>
