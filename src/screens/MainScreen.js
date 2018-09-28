@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Platform, Text, View, ActivityIndicator } from 'react-native'
-import { MapView, Location, Permissions, animateToNavigation, animateToRegion } from 'expo';
+import { MapView, Location, Permissions } from 'expo';
 import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
-import axios from 'axios';
+import { connect } from 'redux';
+import * as actions from '../actions';
 
 import * as fab from '../helpers/fab';
 import MapCallout from '../components/MapCallout';
@@ -38,8 +39,8 @@ class MainScreen extends Component {
     super(props);
     this.state = {
       mapLoaded: false,
-      errorMessage: null,
-      location: null,
+      //errorMessage: null,
+      //location: null,
       region: null,
       markers: null
       // region: {
@@ -94,8 +95,8 @@ class MainScreen extends Component {
   }
 
   _setInitialRegion = () => {
-    let { latitude, longitude } = this.state.location;
-    console.log(this.state.location);
+    let { latitude, longitude } = this.props.location;
+    console.log(this.props.location);
     let region = {
       latitude: latitude,
       longitude: longitude,
@@ -105,17 +106,17 @@ class MainScreen extends Component {
     this.setState({ region });
   }
 
-  _getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage: 'Permission to access location was denied',
-      });
-    }
+  // _getLocationAsync = async () => {
+  //   let { status } = await Permissions.askAsync(Permissions.LOCATION);
+  //   if (status !== 'granted') {
+  //     this.setState({
+  //       errorMessage: 'Permission to access location was denied',
+  //     });
+  //   }
 
-    let {coords} = await Location.getCurrentPositionAsync({});
-    this.setState({ location: coords }, () => this._setInitialRegion())
-  }
+  //   let {coords} = await Location.getCurrentPositionAsync({});
+  //   this.setState({ location: coords }, () => this._setInitialRegion())
+  // }
 
   /**
    * The callback method. The method is called after the user presses
@@ -225,4 +226,8 @@ const styles = {
   }
 }
 
-export default MainScreen;
+function mapStateToProps({location}) {
+  return { location: location.location };
+}
+
+export default connect(mapStateToProps, actions) (MainScreen);
