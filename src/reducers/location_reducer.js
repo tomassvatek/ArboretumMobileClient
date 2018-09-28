@@ -3,7 +3,7 @@ import {
     USER_LOCATION_CHANGE_FAILURE
 } from '../actions/types';
 
-export default function (state, action) {
+export default function (state = {}, action) {
     switch(action.type) {
         case USER_LOCATION_CHANGE_SUCCESS:
             return {location: action.payload};

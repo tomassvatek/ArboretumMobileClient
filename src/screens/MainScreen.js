@@ -226,8 +226,8 @@ const styles = {
   }
 }
 
-function mapStateToProps({location}) {
-  return { location: location.location };
+function mapStateToProps(state) {
+  return { location: state.location };
 }
 
 export default connect(mapStateToProps, actions) (MainScreen);
