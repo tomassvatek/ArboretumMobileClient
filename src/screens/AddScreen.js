@@ -13,14 +13,17 @@ class AddScreen extends Component {
           <FormInput
             inputStyle={styles.formInputStyle}
             placeholderTextColor={config.INPUT_PLACEHOLDER_COLOR}
+            underlineColorAndroid="transparent"
             placeholder="Název stromu"/>
           <FormInput
             inputStyle={styles.formInputStyle}
             placeholderTextColor={config.INPUT_PLACEHOLDER_COLOR}
+            underlineColorAndroid="transparent"
             placeholder="Latitude"/>
           <FormInput 
             inputStyle={styles.formInputStyle}
             placeholderTextColor={config.INPUT_PLACEHOLDER_COLOR}
+            underlineColorAndroid="transparent"
             placeholder="Longitude"/>
           <Button 
             buttonStyle={styles.buttonStyle}

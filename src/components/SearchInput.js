@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { TextInput, View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
 
-import colors from '../config/colors';
+import * as config from '../config';
 
 class SearchInput extends Component {
   render() {
@@ -10,9 +10,9 @@ class SearchInput extends Component {
             <TextInput
                 style={styles.textInputStyle}
                 placeholder={this.props.placeholder}
-                placeholderTextColor= {colors.placeholderTextColor}
+                placeholderTextColor= {config.INPUT_PLACEHOLDER_COLOR}
                 editable={false}
-                underlineColorAndroid='rgba(0,0,0,0)'>
+                underlineColorAndroid='transparent'>
             </TextInput>
         </TouchableOpacity>
     )
