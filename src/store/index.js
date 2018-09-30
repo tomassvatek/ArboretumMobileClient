@@ -8,7 +8,7 @@ const initialState = {
 
 const store = createStore(
     reducers,
-    {},
+    initialState,
     compose (
       applyMiddleware(thunk)
     )

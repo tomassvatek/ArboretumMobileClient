@@ -37,16 +37,8 @@ class MainScreen extends Component {
 
   state = {
     mapLoaded: false,
-    //errorMessage: null,
-    //location: null,
     region: null,
     markers: null
-    // region: {
-    //   latitude: 37.78825,
-    //   longitude: -122.4324,
-    //   latitudeDelta: 0.0922,
-    //   longitudeDelta: 0.0421
-    // }
   };
 
 
@@ -60,12 +52,21 @@ class MainScreen extends Component {
   /**
    * The Lifecycle method.
    */
-  componentDidMount() {
+  componentWillMount() {
     if(Platform.OS === 'android') {
-      this.props.getUserLocation();
-      this._setInitialRegion();
-      this.setState({mapLoaded: true});
+      this.props.getUserLocation().then(this._setInitialRegion);
     }
+  }
+
+  _setInitialRegion = () => {
+    let { location } = this.props.location;
+    let region = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421
+    }
+    this.setState({ region });
   }
 
 
@@ -77,18 +78,6 @@ class MainScreen extends Component {
     this.setState({region});
   }
 
-  _setInitialRegion = () => {
-    let { latitude, longitude } = this.props.location;
-    let region = {
-      latitude: latitude,
-      longitude: longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421
-    }
-
-    this.setState({ region });
-    console.log('set initial region');
-  }
 
   /**
    * The callback method. The method is called after the user presses
