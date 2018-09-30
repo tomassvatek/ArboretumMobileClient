@@ -12,5 +12,6 @@ export const getUserLocation = () => async dispatch => {
 
     let { coords } = await Location.getCurrentPositionAsync({});
     dispatch({type: USER_LOCATION_CHANGE_SUCCESS, payload: coords})
+    console.log(coords);
 }
 

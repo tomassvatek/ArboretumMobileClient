@@ -3,7 +3,7 @@ import { Platform, Text, View, ActivityIndicator } from 'react-native'
 import { MapView, Location, Permissions } from 'expo';
 import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
-import { connect } from 'redux';
+import { connect } from 'react-redux';
 import * as actions from '../actions';
 
 import * as fab from '../helpers/fab';
@@ -35,35 +35,37 @@ class MainScreen extends Component {
     title: 'Mapa'
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      mapLoaded: false,
-      //errorMessage: null,
-      //location: null,
-      region: null,
-      markers: null
-      // region: {
-      //   latitude: 37.78825,
-      //   longitude: -122.4324,
-      //   latitudeDelta: 0.0922,
-      //   longitudeDelta: 0.0421
-      // }
-    };
-  }
+  state = {
+    mapLoaded: false,
+    //errorMessage: null,
+    //location: null,
+    region: null,
+    markers: null
+    // region: {
+    //   latitude: 37.78825,
+    //   longitude: -122.4324,
+    //   latitudeDelta: 0.0922,
+    //   longitudeDelta: 0.0421
+    // }
+  };
 
 
-  componentWillMount() {
-    if(Platform.OS === 'android') {
-      this._getLocationAsync();
-    }
-  }
+  // componentWillMount() {
+  //   if(Platform.OS === 'android') {
+  //     this.props.getUserLocation();
+  //     this._setInitialRegion();
+  //   }
+  // }
 
   /**
    * The Lifecycle method.
    */
   componentDidMount() {
-    this.setState({mapLoaded: true});
+    if(Platform.OS === 'android') {
+      this.props.getUserLocation();
+      this._setInitialRegion();
+      this.setState({mapLoaded: true});
+    }
   }
 
 
@@ -71,52 +73,22 @@ class MainScreen extends Component {
    * The callback method. The method is called after the user changes 
    * the region, then the region state is updated.
    */
-  onRegionChangeComplete = region => {
+  _onRegionChangeComplete = region => {
     this.setState({region});
-  }
-
-  onMapReady = () => {
-    // console.log(this.mapView);
-    // if(this.state.location) {
-    //   const { coords } = this.state.location;
-    //   let region = {
-    //     latitude: coords.latitude,
-    //     longitude: coords.longitude,
-    //     latitudeDelta: 0.0922,
-    //     longitudeDelta: 0.0421
-    //   }
-    //   console.log(region);
-    //   this.setState({region}, () => {console.log(this.state.region)} );
-    // }
-  }
-
-  _handleCalloutPress = () => {
-    this.props.navigation.navigate('detail');
   }
 
   _setInitialRegion = () => {
     let { latitude, longitude } = this.props.location;
-    console.log(this.props.location);
     let region = {
       latitude: latitude,
       longitude: longitude,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421
     }
+
     this.setState({ region });
+    console.log('set initial region');
   }
-
-  // _getLocationAsync = async () => {
-  //   let { status } = await Permissions.askAsync(Permissions.LOCATION);
-  //   if (status !== 'granted') {
-  //     this.setState({
-  //       errorMessage: 'Permission to access location was denied',
-  //     });
-  //   }
-
-  //   let {coords} = await Location.getCurrentPositionAsync({});
-  //   this.setState({ location: coords }, () => this._setInitialRegion())
-  // }
 
   /**
    * The callback method. The method is called after the user presses
@@ -124,6 +96,11 @@ class MainScreen extends Component {
    */
   _handleSerchInputPress = () => {
     this.props.navigation.navigate('filter');
+  }
+
+
+  _handleCalloutPress = () => {
+    this.props.navigation.navigate('detail');
   }
 
   /**
@@ -148,7 +125,7 @@ class MainScreen extends Component {
   }
 
   _handleFabItemAddPress = () => {
-    this.props.navigation.navigate('add');
+    console.log(this.props.location);
   }
 
   _handleFabItemMyPositionPress = () => {
@@ -179,9 +156,9 @@ class MainScreen extends Component {
   }
 
   render() {
-    if(!this.state.mapLoaded || !this.state.location) {
+    if(!this.props.location) {
       return (
-        <View style={[styles.containerStyle, {justifyContent: 'center', alignItems: 'center'}]}>
+        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
           <ActivityIndicator size='large' />
         </View>
       )
@@ -194,8 +171,7 @@ class MainScreen extends Component {
           initialRegion={this.state.region}
           showsUserLocation
           folowUsersLocation
-          onMapReady={this.onMapReady}
-          onRegionChangeComplete={this.onRegionChangeComplete}
+          onRegionChangeComplete={this._onRegionChangeComplete}
           onCalloutPress={this._handleCalloutPress} >
           {this._renderMarkers(MARKERS)}
         </MapView>
@@ -227,7 +203,9 @@ const styles = {
 }
 
 function mapStateToProps(state) {
-  return { location: state.location };
+  return { 
+    location: state.location
+  };
 }
 
 export default connect(mapStateToProps, actions) (MainScreen);
