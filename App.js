@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, StatusBar } from 'react-native';
 import {Button} from 'react-native-elements';
-
 import {createStackNavigator, createBottomTabNavigator} from 'react-navigation';
+import {Provider} from 'react-redux';
+
+import store from './src/store';
 import AddScreen from './src/screens/AddScreen';
 import AuthScreen from './src/screens/AuthScreen';
 import EditScreen from './src/screens/EditScreen';
@@ -28,10 +30,9 @@ export default class App extends React.Component {
     });
 
     return (
-      <View style={styles.container}>
-        {/* <MainNavigator/> */}
-        <AddScreen/>
-      </View>
+      <Provider store={store}>
+          <MainNavigator/>
+      </Provider>
     );
   }
 }
