@@ -8,7 +8,7 @@ export default function (state = {}, action) {
         case USER_LOCATION_CHANGE_SUCCESS:
             return {location: action.payload};
         case USER_LOCATION_CHANGE_FAILURE:
-            return {errorMessage: action.payload};
+            return {errorMessage: 'Location is not granted'};
         default:
             return state;
     }

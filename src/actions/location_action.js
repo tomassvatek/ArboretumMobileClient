@@ -8,14 +8,14 @@ export const getUserLocation = () => async dispatch => {
     try {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
-            dispatch({type: USER_LOCATION_CHANGE_FAILURE, payload: "Location is not granted" });
+            dispatch({ type: USER_LOCATION_CHANGE_FAILURE });
         }
 
         let { coords } = await Location.getCurrentPositionAsync({});
-        dispatch({type: USER_LOCATION_CHANGE_SUCCESS, payload: coords})
+        dispatch({ type: USER_LOCATION_CHANGE_SUCCESS, payload: coords })
     }
-    catch(err) {
-        console.error(err);
+    catch(error) {
+        console.error(error);
     }
 }
 
