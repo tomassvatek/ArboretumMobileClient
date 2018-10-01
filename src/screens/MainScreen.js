@@ -5,8 +5,9 @@ import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import MapViewClustering from 'react-native-map-clustering';
+import MapWithClustering  from 'react-native-map-clustering';
 
+import * as config from '../config';
 import * as fab from '../helpers/fab';
 import MapCallout from '../components/MapCallout';
 import SearchInput from '../components/SearchInput';
@@ -38,7 +39,12 @@ class MainScreen extends Component {
 
   state = {
     mapLoaded: false,
-    region: null,
+    region: {
+      latitude: 50.1200885,
+      latitudeDelta: 0.0922,
+      longitude: 14.4597821,
+      longitudeDelta: 0.0421
+    },
     markers: null
   };
 
@@ -56,6 +62,7 @@ class MainScreen extends Component {
   componentWillMount() {
     if(Platform.OS === 'android') {
       this.props.getUserLocation().then(this._setInitialRegion);
+      console.log(this.state.region);
     }
   }
 
@@ -77,6 +84,7 @@ class MainScreen extends Component {
    */
   _onRegionChangeComplete = region => {
     this.setState({region});
+    console.log(this.state.region);
   }
 
 
@@ -115,11 +123,11 @@ class MainScreen extends Component {
   }
 
   _handleFabItemAddPress = () => {
-    console.log(this.props.location);
+    this.props.navigation.navigate('add');
   }
 
   _handleFabItemMyPositionPress = () => {
-    console.log('My positon button press');
+    console.log('Nearest button press');
   }
 
   _handleFabItemNearestPress = () => {
@@ -155,16 +163,17 @@ class MainScreen extends Component {
     }
     return (
       <View style={styles.containerStyle}>
-        <MapViewClustering
-          ref={(map) => (this.map = map)}
-          style={{flex:1}}
-          initialRegion={this.state.region}
+        <MapWithClustering 
+          style={{flex:1}} 
+          region={this.state.region} 
           showsUserLocation
           folowUsersLocation
+          clusterTextColor={config.PRIMARY_COLOR}
+          clusterBorderColor={config.PRIMARY_COLOR}
           onRegionChangeComplete={this._onRegionChangeComplete}
           onCalloutPress={this._handleCalloutPress} >
           {this._renderMarkers(MARKERS)}
-        </MapViewClustering>
+        </MapWithClustering >
         <View style={styles.overlayMapStyle}>
           <SearchInput
             placeholder='Jaký strom hledáte?' 
