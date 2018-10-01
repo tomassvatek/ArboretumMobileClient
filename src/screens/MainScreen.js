@@ -5,6 +5,7 @@ import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
+import MapViewClustering from 'react-native-map-clustering';
 
 import * as fab from '../helpers/fab';
 import MapCallout from '../components/MapCallout';
@@ -154,7 +155,7 @@ class MainScreen extends Component {
     }
     return (
       <View style={styles.containerStyle}>
-        <MapView
+        <MapViewClustering
           ref={(map) => (this.map = map)}
           style={{flex:1}}
           initialRegion={this.state.region}
@@ -163,7 +164,7 @@ class MainScreen extends Component {
           onRegionChangeComplete={this._onRegionChangeComplete}
           onCalloutPress={this._handleCalloutPress} >
           {this._renderMarkers(MARKERS)}
-        </MapView>
+        </MapViewClustering>
         <View style={styles.overlayMapStyle}>
           <SearchInput
             placeholder='Jaký strom hledáte?' 

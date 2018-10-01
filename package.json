@@ -15,6 +15,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-elements": "^0.19.1",
     "react-native-floating-action": "^1.13.0",
+    "react-native-map-clustering": "^1.3.0",
     "react-navigation": "^2.14.2",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
