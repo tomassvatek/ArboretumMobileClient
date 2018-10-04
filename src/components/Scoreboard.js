@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
-import { Text, View } from 'react-native'
+import React, { Component } from 'react';
+import { Text, View } from 'react-native';
+import PropTypes from 'prop-types';
 
 class Scoreboard extends Component {
   render() {
@@ -34,5 +35,11 @@ const styles = {
         fontSize: 17
     }
 }
+
+Scoreboard.propTypes = {
+    correct: PropTypes.number.isRequired,
+    total: PropTypes.number.isRequired
+}
+
 
 export default Scoreboard;

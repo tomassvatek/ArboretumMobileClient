@@ -1,16 +1,13 @@
 import React, { Component } from 'react'
-import { Platform, Text, View, ActivityIndicator } from 'react-native'
-import { MapView, Location, Permissions } from 'expo';
+import { Platform, View, ActivityIndicator } from 'react-native'
 import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
-import * as actions from '../actions';
-import MapWithClustering  from 'react-native-map-clustering';
 
-import * as config from '../config';
+import * as actions from '../actions';
 import * as fab from '../helpers/fab';
-import MapCallout from '../components/MapCallout';
 import SearchInput from '../components/SearchInput';
+import Map from '../components/Map';
 
 // MOCK DATA
 const MARKERS = [
@@ -47,14 +44,6 @@ class MainScreen extends Component {
     },
     markers: null
   };
-
-
-  // componentWillMount() {
-  //   if(Platform.OS === 'android') {
-  //     this.props.getUserLocation();
-  //     this._setInitialRegion();
-  //   }
-  // }
 
   /**
    * The Lifecycle method.
@@ -134,24 +123,7 @@ class MainScreen extends Component {
     console.log('Nearest button press');
   }
 
-  /**
-   * Render markers to the map.
-   * [markers] - list of markers. 
-   */
-  _renderMarkers = markers => {
-    return markers.map( marker => 
-        <MapView.Marker
-          key={marker.id}
-          coordinate={marker.latlng}
-          title={marker.title}
-          description={marker.description}
-          showsUserLocation
-          folowUsersLocation
-          pinColor='green'
-          onCalloutPress={() => /*this.props.navigation.navigate('detail')*/ console.log('callout pressed') }>
-        </MapView.Marker>
-      )
-  }
+  _renderOverlay = () => <SearchInput/>
 
   render() {
     if(!this.props.location) {
@@ -163,22 +135,14 @@ class MainScreen extends Component {
     }
     return (
       <View style={styles.containerStyle}>
-        <MapWithClustering 
-          style={{flex:1}} 
-          region={this.state.region} 
-          showsUserLocation
-          folowUsersLocation
-          clusterTextColor={config.PRIMARY_COLOR}
-          clusterBorderColor={config.PRIMARY_COLOR}
+        <Map
+          mapStyle={styles.mapStyle}
+          overlayMapStyle={styles.overlayMapStyle}
+          region={this.state.region}
           onRegionChangeComplete={this._onRegionChangeComplete}
-          onCalloutPress={this._handleCalloutPress} >
-          {this._renderMarkers(MARKERS)}
-        </MapWithClustering >
-        <View style={styles.overlayMapStyle}>
-          <SearchInput
-            placeholder='Jaký strom hledáte?' 
-            onPress={this._handleSerchInputPress} />
-        </View>
+        >
+          {this._renderOverlay}
+        </Map>
         <FloatingAction 
           actions={fab.FAB_ACTIONS}
           onPressItem={name => this._handleFabItemPress(name)}/>
@@ -191,6 +155,11 @@ const styles = {
   containerStyle: {
     flex: 1
   },
+
+  mapStyle: {
+    flex: 1
+  },
+
   overlayMapStyle: {
     position: 'absolute',
     top: 70,
