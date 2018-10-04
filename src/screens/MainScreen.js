@@ -10,11 +10,12 @@ import SearchInput from '../components/SearchInput';
 import Map from '../components/Map';
 
 // MOCK DATA
-const MARKERS = [
-  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459783 }, title: 'Title', description: 'description'},
-  {id: 2, latlng: {latitude: 50.1300886, longitude: 14.459783 }, title: 'Title', description: 'description'},
-  {id: 3, latlng: {latitude: 50.1400886, longitude: 14.459783 }, title: 'Title', description: 'description'},
-  {id: 4, latlng: {latitude: 50.1500886, longitude: 14.459783 }, title: 'Title', description: 'description'}
+const DATA = [
+  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459783 }, title: 'Lípa srdčitá', description: 'description', color: 'red'},
+  {id: 2, latlng: {latitude: 50.1300886, longitude: 14.459783 }, title: 'Buk', description: 'description', color: 'blue'},
+  {id: 3, latlng: {latitude: 50.1400886, longitude: 14.459783 }, title: 'Vrba', description: 'description', color: 'green'},
+  {id: 4, latlng: {latitude: 50.1500886, longitude: 14.459783 }, title: 'Kaštan', description: 'description', color: 'yellow'},
+  {id: 4, latlng: {latitude: 50.1600886, longitude: 14.459783 }, title: 'Ořech', description: 'description', color: 'black'}
 ];
 
 class MainScreen extends Component {

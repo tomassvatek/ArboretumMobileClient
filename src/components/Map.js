@@ -6,6 +6,14 @@ import MapWithClustering  from 'react-native-map-clustering';
 
 import * as config from '../config';
 
+const COORDINATES = [
+  {latitude: 50.1200886, longitude: 14.459783 },
+  {latitude: 50.1300886, longitude: 14.459783 },
+  {latitude: 50.1400886, longitude: 14.459783 },
+  {latitude: 50.1500886, longitude: 14.459783 },
+  {latitude: 50.1600886, longitude: 14.459783 }
+]
+
 class Map extends Component {
    /**
    * Render markers to the map.
@@ -20,27 +28,39 @@ class Map extends Component {
           description={marker.description}
           showsUserLocation
           folowUsersLocation
-          pinColor={this.props.pinColor}
-          onCalloutPress={() => /*this.props.navigation.navigate('detail')*/ console.log('callout pressed') }>
+          pinColor={marker.color ? marker.color : this.props.pinColor} >
         </MapView.Marker>
       )
   }
 
+  _renderPolyline = coordinates => {
+    return (
+      <MapView.Polyline
+        coordinates={coordinates}
+        strokeColor='blue'
+        strokeWidth={2}>
+      </MapView.Polyline>
+    )
+  }
+
   render() {
     return (
-      <View style={styles.containerStyle}>
+      <View style={{flex:1}}>
         <MapWithClustering 
           style={this.props.mapStyle} 
           region={this.props.region}
           showsUserLocation={this.props.showsUserLocation}
-          folowUsersLocation={this.props.folowUsersLocation}
+          followsUserLocation={this.props.followsUserLocation}
           clustering={this.props.clustering}
           clusterTextColor={config.PRIMARY_COLOR}
           clusterBorderColor={config.PRIMARY_COLOR}
           onRegionChangeComplete={this.props.onRegionChangeComplete}
-          onCalloutPress={this.props.onCalloutPress} >
+          onCalloutPress={this.props.onCalloutPress} 
+        >
           {this._renderMarkers(this.props.data)}
-        </MapWithClustering >
+          {this.props.renderPolyline}
+        </MapWithClustering>
+
         <View style={this.props.overlayMapStyle}>
           {this.props.children()}
         </View>
@@ -53,28 +73,26 @@ Map.propTypes = {
   region: PropTypes.array.isRequired,
   data: PropTypes.array,
   showsUserLocation: PropTypes.bool,
-  folowUsersLocation: PropTypes.bool,
+  followsUserLocation: PropTypes.bool,
   clustering: PropTypes.bool,
   pinColor: PropTypes.string,
   onRegionChangeComplete: PropTypes.func,
-  onCalloutPress: PropTypes.func
+  onCalloutPress: PropTypes.func,
+  children: PropTypes.func,
+  renderPolyline: PropTypes.element
+
 }
 
 Map.defaultProps = {
   data: [],
   showsUserLocation: false,
-  folowUsersLocation: false,
+  followsUserLocation: false,
   clustering: false,
   pinColor: 'green',
   onRegionChangeComplete: () => {},
-  onCalloutPress: () => {}
-}
-
-
-const styles = {
-  containerStyle: {
-    flex: 1
-  }
+  onCalloutPress: () => {},
+  children: () => {},
+  renderPolyline: <View/>
 }
 
 export default Map;

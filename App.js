@@ -7,7 +7,6 @@ import {Provider} from 'react-redux';
 import store from './src/store';
 import AddScreen from './src/screens/AddScreen';
 import AuthScreen from './src/screens/AuthScreen';
-import EditScreen from './src/screens/EditScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import FilterScreen from './src/screens/FilterScreen';
 import MainScreen from './src/screens/MainScreen';
@@ -31,8 +30,8 @@ export default class App extends React.Component {
 
     return (
       <Provider store={store}>
-          <MainScreen/>
-          {/* <QuizScreen/> */}
+          <QuizScreen/>
+          {/* <MainScreen/> */}
           {/* <MainNavigator/> */}
       </Provider>
     );
