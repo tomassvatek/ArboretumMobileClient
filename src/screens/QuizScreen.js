@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 import {Icon} from 'react-native-elements';
-import {MapView} from 'expo';
+import { MapView } from 'expo';
 
+import { getPolylineCoordinates } from '../utils';
 import ScoreBoard from '../components/Scoreboard';
 import Map from '../components/Map';
+
 
 // MOCK DATA
 const DATA = [
@@ -21,7 +23,17 @@ const COORDINATES = [
   {latitude: 50.1400886, longitude: 14.459783 },
   {latitude: 50.1500886, longitude: 14.459783 },
   {latitude: 50.1600886, longitude: 14.459783 }
-]
+];
+
+const origin = {
+  latitude: 50.1200886, 
+  longitude: 14.459783 
+};
+
+const destination = {
+  latitude: 50.1300886, 
+  longitude: 14.459783
+};
 
 class QuizScreen extends Component {
   static navigationOptions = {
@@ -40,6 +52,12 @@ class QuizScreen extends Component {
       longitude: 14.4597821,
       longitudeDelta: 0.0421
     },
+    coordinates: null
+  }
+
+  componentDidMount() {
+    getPolylineCoordinates(origin, destination)
+                          .then((coordinates) => this.setState({coordinates}));
   }
 
   _navigateToPlace = () => {
@@ -49,9 +67,12 @@ class QuizScreen extends Component {
   _renderPolyline = () => {
     return (
       <MapView.Polyline
-        coordinates={COORDINATES}
-        strokeColor='red'
-        strokeWidth={2} >
+        coordinates={this.state.coordinates}
+        strokeColor='#00B3FD'
+        strokeWidth={3}
+        miterLimit={15}
+        lineCap='round'
+        lineJoin='round' >
       </MapView.Polyline>
     )
   }
@@ -67,6 +88,13 @@ class QuizScreen extends Component {
   render() {
     if(DATA.length < 5)
       return this._rederNoDataMessage()
+    if(!this.state.coordinates) {
+      return (
+        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
     return (
       <View style={styles.containerStyle}>
         <View style={{height:70}}>

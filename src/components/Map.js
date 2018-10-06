@@ -6,6 +6,7 @@ import MapWithClustering  from 'react-native-map-clustering';
 
 import * as config from '../config';
 
+// MOCK DATA
 const COORDINATES = [
   {latitude: 50.1200886, longitude: 14.459783 },
   {latitude: 50.1300886, longitude: 14.459783 },
@@ -31,16 +32,6 @@ class Map extends Component {
           pinColor={marker.color ? marker.color : this.props.pinColor} >
         </MapView.Marker>
       )
-  }
-
-  _renderPolyline = coordinates => {
-    return (
-      <MapView.Polyline
-        coordinates={coordinates}
-        strokeColor='blue'
-        strokeWidth={2}>
-      </MapView.Polyline>
-    )
   }
 
   render() {
