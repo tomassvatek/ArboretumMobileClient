@@ -125,6 +125,13 @@ class QuizScreen extends Component {
     )
   }
 
+  _renderMarkers = (coordinate) => {
+    return (
+      <MapView.Marker
+        coordinate={coordinate} />
+    )
+  }
+
   render() {
     if(this.state.data.length < 5)
       return this._rederNoDataMessage()
@@ -146,9 +153,9 @@ class QuizScreen extends Component {
           <Map
             mapStyle={{flex:1}} 
             region={this.state.region}
-            data={this.state.data}
             showsUserLocation
             followUserLocation
+            renderMarkers={this._renderMarkers(this.state.destination)}
             renderPolyline={this._renderPolyline()}>
           </Map>
           <Button title='Increment' onPress={() => this._launchQuiz()}></Button>

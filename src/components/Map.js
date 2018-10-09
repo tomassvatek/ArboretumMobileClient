@@ -7,18 +7,6 @@ import MapWithClustering  from 'react-native-map-clustering';
 import * as config from '../config';
 
 class Map extends Component {
-  _renderMarkers = markers => {
-    return markers.map( marker => 
-        <MapView.Marker
-          key={marker.id}
-          coordinate={marker.latlng}
-          title={marker.title}
-          description={marker.description}
-          pinColor={marker.color ? marker.color : this.props.pinColor} >
-        </MapView.Marker>
-      )
-  }
-
   render() {
     return (
       <View style={{flex:1}}>
@@ -33,7 +21,7 @@ class Map extends Component {
           onRegionChangeComplete={this.props.onRegionChangeComplete}
           onCalloutPress={this.props.onCalloutPress} 
         >
-          {this._renderMarkers(this.props.data)}
+          {this.props.renderMarkers}
           {this.props.renderPolyline}
         </MapWithClustering>
 
@@ -47,26 +35,25 @@ class Map extends Component {
 
 Map.propTypes = {
   region: PropTypes.array.isRequired,
-  data: PropTypes.array,
   showsUserLocation: PropTypes.bool,
   followsUserLocation: PropTypes.bool,
   clustering: PropTypes.bool,
-  pinColor: PropTypes.string,
   onRegionChangeComplete: PropTypes.func,
   onCalloutPress: PropTypes.func,
   children: PropTypes.func,
+  renderMarkers: PropTypes.element,
   renderPolyline: PropTypes.element
 }
 
 Map.defaultProps = {
-  data: [],
+  //data: [],
   showsUserLocation: false,
   followsUserLocation: false,
   clustering: false,
-  pinColor: 'green',
   onRegionChangeComplete: () => {},
   onCalloutPress: () => {},
   children: () => {},
+  renderMarkers: <View/>,
   renderPolyline: <View/>
 }
 

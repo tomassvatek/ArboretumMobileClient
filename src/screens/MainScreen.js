@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Platform, View, ActivityIndicator } from 'react-native'
+import { MapView } from 'expo';
 import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
@@ -125,6 +126,18 @@ class MainScreen extends Component {
 
   _renderOverlay = () => <SearchInput/>
 
+  _renderMarkers = markers => {
+   return markers.map( marker => 
+        <MapView.Marker
+          key={marker.id}
+          coordinate={marker.latlng}
+          title={marker.title}
+          description={marker.description}
+          pinColor={marker.color} >
+        </MapView.Marker>
+      )
+  }
+
   render() {
     if(!this.props.location) {
       return (
@@ -140,6 +153,7 @@ class MainScreen extends Component {
           overlayMapStyle={styles.overlayMapStyle}
           region={this.state.region}
           onRegionChangeComplete={this._onRegionChangeComplete}
+          renderMarkers={this._renderMarkers(DATA)}
         >
           {this._renderOverlay}
         </Map>
