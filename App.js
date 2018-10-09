@@ -30,9 +30,9 @@ export default class App extends React.Component {
 
     return (
       <Provider store={store}>
-          <QuizScreen/>
+          {/* <QuizScreen/> */}
           {/* <MainScreen/> */}
-          {/* <MainNavigator/> */}
+          <MainNavigator/>
       </Provider>
     );
   }

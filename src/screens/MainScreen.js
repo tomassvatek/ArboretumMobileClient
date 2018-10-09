@@ -52,7 +52,6 @@ class MainScreen extends Component {
   componentWillMount() {
     if(Platform.OS === 'android') {
       this.props.getUserLocation().then(this._setInitialRegion);
-      console.log(this.state.region);
     }
   }
 

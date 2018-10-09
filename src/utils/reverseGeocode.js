@@ -4,6 +4,11 @@ import qs from 'qs';
 const GEOCODE_ROOT_URL = `https://maps.googleapis.com/maps/api/geocode/json?`;  
 const GOOGLE_API_KEY = 'AIzaSyAeTR9DniCDMtCLdcYKtZ-TUH3JSPFVjuY';
 
+/**
+ * Convert geographic coordinates to the address.
+ * @param {number} latitude 
+ * @param {number} longitude 
+ */
 export const reverseGeocode = async (latitude, longitude) => {
     const url = buildGeocodeUrl(latitude, longitude);
     let { data } = await axios.get(url);
@@ -41,6 +46,7 @@ const buildGeocodeUrl = (latitude, longitude) => {
     return `${GEOCODE_ROOT_URL}${query}`;
 };
 
+
 const formatAddress = address => {
     const arrayAddress = address.split(',');
     return removeCountry(arrayAddress);
@@ -59,6 +65,10 @@ const formatAddress = address => {
 //     console.log(arr);
 // }
 
+/**
+ * Remove the city attribute from the address.
+ * @param {string} address 
+ */
 const removeCountry = address => {
     address.pop();
     return address;
