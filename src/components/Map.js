@@ -19,6 +19,7 @@ class Map extends Component {
           clusterTextColor={config.PRIMARY_COLOR}
           clusterBorderColor={config.PRIMARY_COLOR}
           onRegionChangeComplete={this.props.onRegionChangeComplete}
+          onUserLocationChange={this.props.onUserLocationChange}
           onCalloutPress={this.props.onCalloutPress} 
         >
           {this.props.renderMarkers}
@@ -34,11 +35,12 @@ class Map extends Component {
 }
 
 Map.propTypes = {
-  region: PropTypes.array.isRequired,
+  region: PropTypes.object.isRequired,
   showsUserLocation: PropTypes.bool,
   followsUserLocation: PropTypes.bool,
   clustering: PropTypes.bool,
   onRegionChangeComplete: PropTypes.func,
+  onUserLocationChange: PropTypes.func,
   onCalloutPress: PropTypes.func,
   children: PropTypes.func,
   renderMarkers: PropTypes.element,
@@ -46,11 +48,11 @@ Map.propTypes = {
 }
 
 Map.defaultProps = {
-  //data: [],
   showsUserLocation: false,
   followsUserLocation: false,
   clustering: false,
   onRegionChangeComplete: () => {},
+  onUserLocationChange: () => {},
   onCalloutPress: () => {},
   children: () => {},
   renderMarkers: <View/>,

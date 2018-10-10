@@ -1,20 +1,29 @@
 import React, { Component } from 'react';
-import { Text, View, ActivityIndicator } from 'react-native';
+import { Text, View, ActivityIndicator, Modal } from 'react-native';
 import {Icon, Button} from 'react-native-elements';
 import { MapView } from 'expo'
 import { connect } from 'react-redux';
+import geolib from 'geolib';
 
 import { getPolylineCoordinates } from '../utils';
 import ScoreBoard from '../components/Scoreboard';
 import Map from '../components/Map';
 
-// MOCK DATA
+/**
+ * TODO:
+ * modal 
+ * tracking location
+ * evualate answer
+ * 
+ */
+
+// TODO: Replace a real data from API
 const DATA = [
-  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459783 }, title: 'Lípa srdčitá', description: 'description', color: 'red'},
-  {id: 2, latlng: {latitude: 50.1300886, longitude: 14.459783 }, title: 'Buk', description: 'description', color: 'blue'},
-  {id: 3, latlng: {latitude: 50.1400886, longitude: 14.459783 }, title: 'Vrba', description: 'description', color: 'green'},
-  {id: 4, latlng: {latitude: 50.1500886, longitude: 14.459783 }, title: 'Kaštan', description: 'description', color: 'yellow'},
-  {id: 5, latlng: {latitude: 50.1600886, longitude: 14.459783 }, title: 'Ořech', description: 'description', color: 'black'}
+  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459083 }, title: 'Lípa srdčitá', description: 'description', color: 'red'},
+  {id: 2, latlng: {latitude: 50.1370886, longitude: 14.459183 }, title: 'Buk', description: 'description', color: 'blue'},
+  {id: 3, latlng: {latitude: 50.1420886, longitude: 14.459283 }, title: 'Vrba', description: 'description', color: 'green'},
+  {id: 4, latlng: {latitude: 50.1530886, longitude: 14.459983 }, title: 'Kaštan', description: 'description', color: 'yellow'},
+  {id: 5, latlng: {latitude: 50.1620886, longitude: 14.459883 }, title: 'Ořech', description: 'description', color: 'black'}
 ];
 
 class QuizScreen extends Component {
@@ -89,13 +98,26 @@ class QuizScreen extends Component {
 
       this.setState({destination: this.state.data[this.state.index + 1].latlng}, () => {
           getPolylineCoordinates(this.state.origin, this.state.destination)
-                                 .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ))
+                                .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ));
+          this._calculateDistance();
       });
     }
   }
 
   _incrementIndex = () => {
     this.setState((prevState) => ({index: prevState.index + 1}));
+  }
+
+  _calculateDistance = () => {
+    let distance = geolib.getDistance(this.state.origin, this.state.destination);
+    console.log(`Distance between origin: [${this.state.origin.latitude}, ${this.state.origin.longitude}] and destination: [${this.state.destination.latitude}, ${this.state.destination.longitude}] is ${distance} meters.`);
+  }
+
+  _renderMarkers = () => {
+    return (
+      <MapView.Marker
+        coordinate={this.state.destination} />
+    )
   }
 
   _renderPolyline = () => {
@@ -111,12 +133,6 @@ class QuizScreen extends Component {
     )
   }
 
-  // _renderMarkers = marker => {
-  //   <MapView.Marker
-  //     coordinate={marker.latlng}>
-  //   </MapView.Marker>
-  // }
-
   _rederNoDataMessage = () => {
     return (
       <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
@@ -125,11 +141,22 @@ class QuizScreen extends Component {
     )
   }
 
-  _renderMarkers = (coordinate) => {
+  _renderModal = () => {
     return (
-      <MapView.Marker
-        coordinate={coordinate} />
+      <Modal
+        animationType='slide'
+        transparent={false}
+        visible={true}
+      >
+        <View style={styles.modalContent}>
+          <Text>Hello</Text>
+        </View>
+      </Modal>
     )
+  }
+
+  _handleUserLocationChange = () => {
+    console.log('position change');
   }
 
   render() {
@@ -155,9 +182,21 @@ class QuizScreen extends Component {
             region={this.state.region}
             showsUserLocation
             followUserLocation
-            renderMarkers={this._renderMarkers(this.state.destination)}
+            onUserLocationChange={this._handleUserLocationChange()}
+            renderMarkers={this._renderMarkers()}
             renderPolyline={this._renderPolyline()}>
           </Map>
+          {/* <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+              <Modal
+                animationType='slide'
+                transparent={false}
+                visible={true}
+              >
+              <View style={styles.modalContent}>
+                <Text>Hello</Text>
+              </View>
+            </Modal>
+          </View> */}
           <Button title='Increment' onPress={() => this._launchQuiz()}></Button>
       </View>
     )
@@ -169,6 +208,9 @@ const styles = {
     flex: 1,
     // REFACTOR STATUS BAR
     marginTop: 25
+  },
+  modalContent: {
+    flex: 1
   }
 }
 
