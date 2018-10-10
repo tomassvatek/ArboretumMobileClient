@@ -12,7 +12,12 @@ export const getUserLocation = () => async dispatch => {
         }
 
         let { coords } = await Location.getCurrentPositionAsync({});
-        dispatch({ type: USER_LOCATION_CHANGE_SUCCESS, payload: coords })
+        let latLng = {
+            latitude: coords.latitude,
+            longitude: coords.longitude
+        }
+        console.log(latLng);
+        dispatch({ type: USER_LOCATION_CHANGE_SUCCESS, payload: latLng })
     }
     catch(error) {
         console.error(error);

@@ -46,8 +46,7 @@ class QuizScreen extends Component {
       correct: 0,
       total: 5
     },
-    index: -1,
-    origin: null,
+    index: 0,
     destination: null,
     polylineCoordinates: null
   }
@@ -64,42 +63,23 @@ class QuizScreen extends Component {
   _evualuteAnswer = () => {
   }
 
+  
   _launchQuiz = () => {
-    if(this.state.index <= -1) {
-      this._firstTree();
-    }
-    else {
-      this._nextTree();
-    }
-  }
-
-  _firstTree = () => {
-    console.log('firstTree');
-    const { location } = this.props.location;
-    const origin = {
-      latitude: location.latitude,
-      longitude: location.longitude
-    }
-    
-    this.setState((prevState) => ({index: prevState.index + 1}), () => {
-      this.setState({origin, destination: this.state.data[this.state.index].latlng}, () => {
-        getPolylineCoordinates(this.state.origin, this.state.destination).then((polylineCoordinates) => this.setState({polylineCoordinates}))
-    });
-      // this.setState({destination: this.state.data[this.state.index].latlng}, () => {
-      //   getPolylineCoordinates(this.state.origin, this.state.destination).then((polylineCoordinates) => this.setState({polylineCoordinates}))
-      // });
-    })
+    this._nextTree();
   }
 
   _nextTree = () => {
-    if(this.state.index !== this.state.data.length - 1) {
-      const origin = this.state.data[this.state.index].latlng;
-      this.setState({origin});
-
-      this.setState({destination: this.state.data[this.state.index + 1].latlng}, () => {
-          getPolylineCoordinates(this.state.origin, this.state.destination)
+    if(this.state.index <= this.state.data.length - 1) {
+      const { location } = this.props.location;
+      const current = {
+        latitude: location.latitude,
+        longitude: location.longitude
+      }
+      console.log(this.state.index);
+      this.setState({destination: this.state.data[this.state.index]}, () => {
+          getPolylineCoordinates(current, this.state.destination.latlng)
                                 .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ));
-          this._calculateDistance();
+          //this._calculateDistance();
       });
     }
   }
@@ -116,7 +96,7 @@ class QuizScreen extends Component {
   _renderMarkers = () => {
     return (
       <MapView.Marker
-        coordinate={this.state.destination} />
+        coordinate={this.state.destination.latlng} />
     )
   }
 
