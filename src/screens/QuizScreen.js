@@ -52,9 +52,7 @@ class QuizScreen extends Component {
   }
 
   componentDidMount() {
-    this._launchQuiz();
-    // console.log(this.state.index);
-    // console.log(this.state.data[this.state.index]);
+    this._nextTree();
   }
 
   _enterAnswer = () => {    
@@ -62,22 +60,13 @@ class QuizScreen extends Component {
 
   _evualuteAnswer = () => {
   }
-
   
-  _launchQuiz = () => {
-    this._nextTree();
-  }
-
   _nextTree = () => {
     if(this.state.index <= this.state.data.length - 1) {
       const { location } = this.props.location;
-      const current = {
-        latitude: location.latitude,
-        longitude: location.longitude
-      }
-      console.log(this.state.index);
+   
       this.setState({destination: this.state.data[this.state.index]}, () => {
-          getPolylineCoordinates(current, this.state.destination.latlng)
+          getPolylineCoordinates(location, this.state.destination.latlng)
                                 .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ));
           //this._calculateDistance();
       });
@@ -89,8 +78,10 @@ class QuizScreen extends Component {
   }
 
   _calculateDistance = () => {
-    let distance = geolib.getDistance(this.state.origin, this.state.destination);
-    console.log(`Distance between origin: [${this.state.origin.latitude}, ${this.state.origin.longitude}] and destination: [${this.state.destination.latitude}, ${this.state.destination.longitude}] is ${distance} meters.`);
+    const { location } = this.props.location;
+
+    let distance = geolib.getDistance(location, this.state.destination);
+    console.log(`Distance between origin: [${location.latitude}, ${location.longitude}] and destination: [${this.state.destination.latng.latitude}, ${this.state.destination.latng.longitude}] is ${distance} meters.`);
   }
 
   _renderMarkers = () => {
@@ -177,7 +168,7 @@ class QuizScreen extends Component {
               </View>
             </Modal>
           </View> */}
-          <Button title='Increment' onPress={() => this._launchQuiz()}></Button>
+          <Button title='Increment' onPress={() => this._nextTree()}></Button>
       </View>
     )
   }
