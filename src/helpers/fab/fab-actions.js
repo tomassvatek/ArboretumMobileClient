@@ -2,7 +2,7 @@ import {
   FAB_ACTION_ADD,
   FAB_ACTION_MYPOSITION,
   FAB_ACTION_NEAREST
-} from './fab_types';
+} from './fab-types';
 
 export const FAB_ACTIONS = [{
     text: 'Moje poloha',

@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, View, StatusBar } from 'react-native';
-import {Button} from 'react-native-elements';
 import {createStackNavigator, createBottomTabNavigator} from 'react-navigation';
 import {Provider} from 'react-redux';
 
@@ -11,6 +10,7 @@ import DetailScreen from './src/screens/DetailScreen';
 import FilterScreen from './src/screens/FilterScreen';
 import MainScreen from './src/screens/MainScreen';
 import QuizScreen from './src/screens/QuizScreen';
+import ModalTester from './src/screens/Modal';
 
 
 export default class App extends React.Component {
@@ -30,8 +30,6 @@ export default class App extends React.Component {
 
     return (
       <Provider store={store}>
-          {/* <QuizScreen/> */}
-          {/* <MainScreen/> */}
           <MainNavigator/>
       </Provider>
     );

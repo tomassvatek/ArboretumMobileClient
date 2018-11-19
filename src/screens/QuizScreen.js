@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, ActivityIndicator, Modal } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 import {Icon, Button} from 'react-native-elements';
 import { MapView } from 'expo'
 import { connect } from 'react-redux';
 import geolib from 'geolib';
+import Modal from 'react-native-modal';
 
 import { getPolylineCoordinates } from '../utils';
 import ScoreBoard from '../components/Scoreboard';
@@ -52,7 +53,7 @@ class QuizScreen extends Component {
   }
 
   componentDidMount() {
-    this._nextTree();
+    //this._nextTree();
   }
 
   _enterAnswer = () => {    
@@ -68,7 +69,6 @@ class QuizScreen extends Component {
       this.setState({destination: this.state.data[this.state.index]}, () => {
           getPolylineCoordinates(location, this.state.destination.latlng)
                                 .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ));
-          //this._calculateDistance();
       });
     }
   }
@@ -131,15 +131,15 @@ class QuizScreen extends Component {
   }
 
   render() {
-    if(this.state.data.length < 5)
-      return this._rederNoDataMessage()
-    if(!this.state.polylineCoordinates ||	!this.state.destination) {
-      return (
-        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size='large' />
-        </View>
-      )
-    }
+    // if(this.state.data.length < 5)
+    //   return this._rederNoDataMessage()
+    // if(!this.state.polylineCoordinates ||	!this.state.destination) {
+    //   return (
+    //     <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+    //       <ActivityIndicator size='large' />
+    //     </View>
+    //   )
+    // }
     return (
       <View style={styles.containerStyle}>
         <View style={{height:70}}>
@@ -154,21 +154,20 @@ class QuizScreen extends Component {
             showsUserLocation
             followUserLocation
             onUserLocationChange={this._handleUserLocationChange()}
-            renderMarkers={this._renderMarkers()}
-            renderPolyline={this._renderPolyline()}>
+            // renderMarkers={this._renderMarkers()}
+            // renderPolyline={this._renderPolyline()}
+          >
           </Map>
-          {/* <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-              <Modal
-                animationType='slide'
-                transparent={false}
-                visible={true}
-              >
-              <View style={styles.modalContent}>
-                <Text>Hello</Text>
+          <Button title='Increment' onPress={() => this._nextTree()}></Button>
+          <View>
+            <Modal
+              isVisible
+            >
+              <View style={{flex:1}}>
+                <Text>Hello MODAL</Text>
               </View>
             </Modal>
-          </View> */}
-          <Button title='Increment' onPress={() => this._nextTree()}></Button>
+        </View>
       </View>
     )
   }

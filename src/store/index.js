@@ -3,7 +3,7 @@ import reducers from '../reducers';
 import thunk from 'redux-thunk';
 
 const initialState = {
-  location: null
+  // location: null
 }
 
 const store = createStore(

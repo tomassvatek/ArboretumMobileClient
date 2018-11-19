@@ -43,7 +43,7 @@ Map.propTypes = {
   onUserLocationChange: PropTypes.func,
   onCalloutPress: PropTypes.func,
   children: PropTypes.func,
-  renderMarkers: PropTypes.element,
+  renderMarkers: PropTypes.array,
   renderPolyline: PropTypes.element
 }
 

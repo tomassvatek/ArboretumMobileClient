@@ -1,2 +1,2 @@
-export * from './fab_actions';
-export * from './fab_types';
+export * from './fab-actions';
+export * from './fab-types';

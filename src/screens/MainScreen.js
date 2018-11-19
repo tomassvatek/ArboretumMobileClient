@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Platform, View, ActivityIndicator } from 'react-native'
 import { MapView } from 'expo';
-import { Icon } from 'react-native-elements';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
 
@@ -12,11 +11,11 @@ import Map from '../components/Map';
 
 // MOCK DATA
 const DATA = [
-  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459783 }, title: 'Lípa srdčitá', description: 'description', color: 'red'},
-  {id: 2, latlng: {latitude: 50.1300886, longitude: 14.459783 }, title: 'Buk', description: 'description', color: 'blue'},
-  {id: 3, latlng: {latitude: 50.1400886, longitude: 14.459783 }, title: 'Vrba', description: 'description', color: 'green'},
-  {id: 4, latlng: {latitude: 50.1500886, longitude: 14.459783 }, title: 'Kaštan', description: 'description', color: 'yellow'},
-  {id: 5, latlng: {latitude: 50.1600886, longitude: 14.459783 }, title: 'Ořech', description: 'description', color: 'black'}
+  {id: 1, latitude: 50.1200886, longitude: 14.459783, title: 'Lípa srdčitá', description: 'description', color: 'red'},
+  {id: 2, latitude: 50.1300886, longitude: 14.459783, title: 'Buk', description: 'description', color: 'blue'},
+  {id: 3, latitude: 50.1400886, longitude: 14.459783, title: 'Vrba', description: 'description', color: 'green'},
+  {id: 4, latitude: 50.1500886, longitude: 14.459783, title: 'Kaštan', description: 'description', color: 'yellow'},
+  {id: 5, latitude: 50.1600886, longitude: 14.459783, title: 'Ořech', description: 'description', color: 'black'}
 ];
 
 class MainScreen extends Component {
@@ -37,34 +36,29 @@ class MainScreen extends Component {
   }
 
   state = {
-    mapLoaded: false,
-    region: {
-      latitude: 50.1200885,
-      latitudeDelta: 0.0922,
-      longitude: 14.4597821,
-      longitudeDelta: 0.0421
-    },
-    markers: null
+    // mapLoaded: false
   };
 
-  /**
-   * The Lifecycle method.
-   */
-  componentWillMount() {
+  componentDidMount() {
     if(Platform.OS === 'android') {
-      this.props.getUserLocation().then(this._setInitialRegion);
+      this.props.getUserLocation(() => {
+        this._setInitialRegion();
+      });
     }
+
+    this.props.fetchTrees();
   }
 
   _setInitialRegion = () => {
     let { location } = this.props.location;
-    let region = {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421
-    }
-    this.setState({ region });
+    this.setState({ 
+      region: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421
+      }
+    });
   }
 
 
@@ -87,8 +81,15 @@ class MainScreen extends Component {
   }
 
 
-  _handleCalloutPress = () => {
-    this.props.navigation.navigate('detail');
+  //TODO:
+  _handleCalloutPress = (event) => {
+    // Marker coordinates
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    const tree = this.props.trees.find(t => t.latitude === latitude && t.longitude === longitude);
+
+    this.props.fetchTreeById(tree.id, tree.providerName, () => {
+      this.props.navigation.navigate('detail');
+    })
   }
 
   /**
@@ -116,8 +117,10 @@ class MainScreen extends Component {
     this.props.navigation.navigate('add');
   }
 
+
   _handleFabItemMyPositionPress = () => {
-    console.log('Nearest button press');
+    // console.log('Nearest button press');
+    console.log(this.props.trees);
   }
 
   _handleFabItemNearestPress = () => {
@@ -129,17 +132,18 @@ class MainScreen extends Component {
   _renderMarkers = markers => {
    return markers.map( marker => 
         <MapView.Marker
+          identifier={marker.id.toString()}
           key={marker.id}
-          coordinate={marker.latlng}
-          title={marker.title}
-          description={marker.description}
-          pinColor={marker.color} >
+          coordinate={{latitude: marker.latitude, longitude: marker.longitude}}
+          title={marker.dendrology.commonName}
+          description={marker.dendrology.scientificName}
+        >
         </MapView.Marker>
       )
   }
 
   render() {
-    if(!this.props.location) {
+    if(!this.state.region || !this.props.trees) {
       return (
         <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
           <ActivityIndicator size='large' />
@@ -151,9 +155,11 @@ class MainScreen extends Component {
         <Map
           mapStyle={styles.mapStyle}
           overlayMapStyle={styles.overlayMapStyle}
+          clustering
           region={this.state.region}
+          onCalloutPress={(event) => this._handleCalloutPress(event)}
           onRegionChangeComplete={this._onRegionChangeComplete}
-          renderMarkers={this._renderMarkers(DATA)}
+          renderMarkers={this._renderMarkers(this.props.trees)}
         >
           {this._renderOverlay}
         </Map>
@@ -184,10 +190,11 @@ const styles = {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps({location, trees}) {
   return { 
-    location: state.location
-  };
+    location: location,
+    trees: trees
+  }
 }
 
 export default connect(mapStateToProps, actions) (MainScreen);

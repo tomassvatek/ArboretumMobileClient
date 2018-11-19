@@ -1,7 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
 
-const GEOCODE_ROOT_URL = `https://maps.googleapis.com/maps/api/geocode/json?`;  
+const GEOCODE_ROOT_URL = 'https://maps.googleapis.com/maps/api/geocode/json?';  
 const GOOGLE_API_KEY = 'AIzaSyAeTR9DniCDMtCLdcYKtZ-TUH3JSPFVjuY';
 
 /**

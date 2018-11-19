@@ -1,5 +1,8 @@
-import React, { Component } from 'react'
-import { Text, View, ScrollView } from 'react-native'
+import React, { Component } from 'react';
+import { Text, View, ScrollView } from 'react-native';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 
 import CardView from '../components/CardView';
 
@@ -11,18 +14,22 @@ const data = {
 
 class DetailScreen extends Component {
 
-  /**
-   * Navigate to the selected object.
-   */
   navigateUser = () => {
     console.log("hello");
   }
 
   render() {
+    if(!this.props.tree) {
+      return (
+        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
     return (
       <ScrollView>
         <CardView
-          title={data.name}
+          title={this.props.tree.dendrology.commonName}
           text={data.about}
           onComplete={this.navigateUser}
         />
@@ -45,4 +52,11 @@ const styles = {
   }
 }
 
-export default DetailScreen;
+function mapStateToProps({treeDetail}) {
+  console.log(treeDetail);
+  return {
+    tree: treeDetail
+  }
+}
+
+export default connect(mapStateToProps, actions) (DetailScreen)

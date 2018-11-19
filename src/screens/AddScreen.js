@@ -4,7 +4,7 @@ import { Button, FormLabel, FormInput } from 'react-native-elements';
 import { connect } from 'react-redux';
 
 import * as config from '../config';
-import {reverseGeocode} from '../utils/reverseGeocode';
+import {reverseGeocode} from '../utils';
 
 class AddScreen extends Component {
 

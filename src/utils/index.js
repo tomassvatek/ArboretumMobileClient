@@ -1,2 +1,2 @@
-export * from './directions';
-export * from './reverseGeocode';
+export * from './google';
+export * from './replace-string-placeholders';

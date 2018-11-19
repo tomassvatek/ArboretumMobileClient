@@ -1,1 +1,3 @@
-export * from './location_action';
+export * from './location.action';
+export * from './trees.action';
+export * from './tree-detail.action';

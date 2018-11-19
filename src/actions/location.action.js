@@ -4,7 +4,7 @@ import {
     USER_LOCATION_CHANGE_SUCCESS
 } from './types';
 
-export const getUserLocation = () => async dispatch => {
+export const getUserLocation = (callback) => async dispatch => {
     try {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
@@ -16,8 +16,8 @@ export const getUserLocation = () => async dispatch => {
             latitude: coords.latitude,
             longitude: coords.longitude
         }
-        console.log(latLng);
         dispatch({ type: USER_LOCATION_CHANGE_SUCCESS, payload: latLng })
+        callback();
     }
     catch(error) {
         console.error(error);
