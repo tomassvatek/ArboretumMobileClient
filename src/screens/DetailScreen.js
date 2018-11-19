@@ -19,13 +19,13 @@ class DetailScreen extends Component {
   }
 
   render() {
-    if(!this.props.tree) {
-      return (
-        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size='large' />
-        </View>
-      )
-    }
+    // if(!this.props.tree) {
+    //   return (
+    //     <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+    //       <ActivityIndicator size='large' />
+    //     </View>
+    //   )
+    // }
     return (
       <ScrollView>
         <CardView
@@ -53,7 +53,6 @@ const styles = {
 }
 
 function mapStateToProps({treeDetail}) {
-  console.log(treeDetail);
   return {
     tree: treeDetail
   }

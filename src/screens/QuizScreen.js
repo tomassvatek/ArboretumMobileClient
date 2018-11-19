@@ -19,13 +19,13 @@ import Map from '../components/Map';
  */
 
 // TODO: Replace a real data from API
-const DATA = [
-  {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459083 }, title: 'Lípa srdčitá', description: 'description', color: 'red'},
-  {id: 2, latlng: {latitude: 50.1370886, longitude: 14.459183 }, title: 'Buk', description: 'description', color: 'blue'},
-  {id: 3, latlng: {latitude: 50.1420886, longitude: 14.459283 }, title: 'Vrba', description: 'description', color: 'green'},
-  {id: 4, latlng: {latitude: 50.1530886, longitude: 14.459983 }, title: 'Kaštan', description: 'description', color: 'yellow'},
-  {id: 5, latlng: {latitude: 50.1620886, longitude: 14.459883 }, title: 'Ořech', description: 'description', color: 'black'}
-];
+// const DATA = [
+//   {id: 1, latlng: {latitude: 50.1200886, longitude: 14.459083 }, title: 'Lípa srdčitá', description: 'description', color: 'red'},
+//   {id: 2, latlng: {latitude: 50.1370886, longitude: 14.459183 }, title: 'Buk', description: 'description', color: 'blue'},
+//   {id: 3, latlng: {latitude: 50.1420886, longitude: 14.459283 }, title: 'Vrba', description: 'description', color: 'green'},
+//   {id: 4, latlng: {latitude: 50.1530886, longitude: 14.459983 }, title: 'Kaštan', description: 'description', color: 'yellow'},
+//   {id: 5, latlng: {latitude: 50.1620886, longitude: 14.459883 }, title: 'Ořech', description: 'description', color: 'black'}
+// ];
 
 class QuizScreen extends Component {
   static navigationOptions = {
@@ -52,21 +52,24 @@ class QuizScreen extends Component {
     polylineCoordinates: null
   }
 
+  // Nejprve zjistit jak se chová region, zda se mění když posouvám mapu. 
+  // Dávalo by smysl ho dát do Reduxu a sdílet mezi MainScreen a QuizScreen.
   componentDidMount() {
-    //this._nextTree();
+    //this.props.fetchQuizTrees()
+    this._nextTree();
   }
 
-  _enterAnswer = () => {    
-  }
+  // _enterAnswer = () => {    
+  // }
 
-  _evualuteAnswer = () => {
-  }
+  // _evualuteAnswer = () => {
+  // }
   
   _nextTree = () => {
-    if(this.state.index <= this.state.data.length - 1) {
+    if(this.state.index <= this.props.trees.length - 1) {
       const { location } = this.props.location;
    
-      this.setState({destination: this.state.data[this.state.index]}, () => {
+      this.setState({destination: this.props.trees[this.state.index]}, () => {
           getPolylineCoordinates(location, this.state.destination.latlng)
                                 .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ));
       });
@@ -131,15 +134,15 @@ class QuizScreen extends Component {
   }
 
   render() {
-    // if(this.state.data.length < 5)
-    //   return this._rederNoDataMessage()
-    // if(!this.state.polylineCoordinates ||	!this.state.destination) {
-    //   return (
-    //     <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
-    //       <ActivityIndicator size='large' />
-    //     </View>
-    //   )
-    // }
+    if(this.state.data.length < 5)
+      return this._rederNoDataMessage()
+    if(!this.state.polylineCoordinates ||	!this.state.destination) {
+      return (
+        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
     return (
       <View style={styles.containerStyle}>
         <View style={{height:70}}>
@@ -154,12 +157,12 @@ class QuizScreen extends Component {
             showsUserLocation
             followUserLocation
             onUserLocationChange={this._handleUserLocationChange()}
-            // renderMarkers={this._renderMarkers()}
-            // renderPolyline={this._renderPolyline()}
+            renderMarkers={this._renderMarkers()}
+            renderPolyline={this._renderPolyline()}
           >
           </Map>
           <Button title='Increment' onPress={() => this._nextTree()}></Button>
-          <View>
+          {/* <View>
             <Modal
               isVisible
             >
@@ -167,7 +170,7 @@ class QuizScreen extends Component {
                 <Text>Hello MODAL</Text>
               </View>
             </Modal>
-        </View>
+        </View> */}
       </View>
     )
   }
@@ -184,9 +187,11 @@ const styles = {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps({location, quiz }) {
+  console.log(quiz);
   return {
-    location: state.location
+    location: state.location,
+    trees: quiz
   };
 }
 

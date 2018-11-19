@@ -3,6 +3,7 @@ import { Platform, View, ActivityIndicator } from 'react-native'
 import { MapView } from 'expo';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
+import { getBoundingBox } from '../utils';
 
 import * as actions from '../actions';
 import * as fab from '../helpers/fab';
@@ -36,29 +37,33 @@ class MainScreen extends Component {
   }
 
   state = {
-    // mapLoaded: false
+    fetchTreeCompleted: false
   };
 
   componentDidMount() {
     if(Platform.OS === 'android') {
       this.props.getUserLocation(() => {
-        this._setInitialRegion();
-      });
+        this._setInitialRegion(() => this._fetchTrees());
+      })
     }
-
-    this.props.fetchTrees();
   }
 
-  _setInitialRegion = () => {
+  _setInitialRegion = (callback) => {
     let { location } = this.props.location;
     this.setState({ 
       region: {
         latitude: location.latitude,
         longitude: location.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421
+        latitudeDelta: 0.0182,
+        longitudeDelta: 0.0182
       }
     });
+    callback();
+  }
+
+  _fetchTrees = () => {
+    let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.state.region);
+    this.props.fetchTrees(latMin, latMax, lonMin, lonMax, () => this.setState({fetchTreeCompleted: true}));
   }
 
 
@@ -143,7 +148,7 @@ class MainScreen extends Component {
   }
 
   render() {
-    if(!this.state.region || !this.props.trees) {
+    if(!this.state.region || !this.state.fetchTreeCompleted) {
       return (
         <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
           <ActivityIndicator size='large' />
