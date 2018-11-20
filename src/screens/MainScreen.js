@@ -8,7 +8,6 @@ import AutocompleteInput from '../components/AutocompleteInput';
 
 import * as actions from '../actions';
 import * as fab from '../helpers/fab';
-import SearchInput from '../components/SearchInput';
 import Map from '../components/Map';
 
 // MOCK DATA
@@ -47,39 +46,39 @@ class MainScreen extends Component {
 
   componentDidMount() {
     if(Platform.OS === 'android') {
-      this.props.getUserLocation(() => {
-        this._setInitialRegion(() => this._fetchTrees());
-      })
+      this._setInitialRegion(() => this._fetchTrees());
+      this._fetchDendrologies();
     }
   }
 
+  _isReadyToRender = () => {
+    //console.log(`${this.props.trees.length} ${this.props.dendrologies.length} ${this.props.region}`);
+    return this.props.trees.length !== 0 && this.props.dendrologies.length !== 0
+           && this.props.region ? true : false;
+  }
+
   _setInitialRegion = (callback) => {
-    let { location } = this.props.location;
-    let region = {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      latitudeDelta: 0.0182,
-      longitudeDelta: 0.0182
-    }
+    this.props.getUserLocation(() => {
+      let { location } = this.props.location;
+      let region = {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.0182,
+        longitudeDelta: 0.0182
+      }
 
-    this.props.regionChange(region);
-    callback();
-
-
-
-    // this.setState({ 
-    //   region: {
-    //     latitude: location.latitude,
-    //     longitude: location.longitude,
-    //     latitudeDelta: 0.0182,
-    //     longitudeDelta: 0.0182
-    //   }
-    // });
+      this.props.regionChange(region);
+      callback();
+    })
   }
 
   _fetchTrees = () => {
     let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
     this.props.fetchTrees(latMin, latMax, lonMin, lonMax, () => this.setState({fetchTreeCompleted: true}));
+  }
+
+  _fetchDendrologies = () => {
+    this.props.fetchDendrologies();
   }
 
   onRegionChangeComplete = region => {
@@ -149,18 +148,16 @@ class MainScreen extends Component {
 
 
   _handleFabItemMyPositionPress = () => {
-    // console.log('Nearest button press');
-    console.log(this.props.trees);
+    console.log('Nearest button press');
   }
  
   _handleFabItemNearestPress = () => {
     console.log('Nearest button press');
   }
 
-  // _renderOverlay = () => <SearchInput/>
   _renderOverlay = () => 
       <AutocompleteInput 
-        autocompleteItems={AUTOCOMPLETE_ITEMS}
+        autocompleteItems={this.props.dendrologies}
         placeholder="Jaký strom hledáte?"
   />
 
@@ -179,13 +176,13 @@ class MainScreen extends Component {
   }
 
   render() {
-    // if(!this.props.region || !this.state.fetchTreeCompleted) {
-    //   return (
-    //     <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
-    //       <ActivityIndicator size='large' />
-    //     </View>
-    //   )
-    // }
+    if(!this._isReadyToRender()) {
+      return (
+        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
     return (
       <View style={styles.containerStyle}>
         <Map
@@ -228,11 +225,10 @@ const styles = {
 }
 
 function mapStateToProps(state) {
-  // console.log("App state:");
-  // console.log(state);
   return { 
     location: state.location,
     trees: state.trees,
+    dendrologies: state.dendrologies,
     region: state.region
   }
 }
