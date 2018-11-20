@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import geolib from 'geolib';
 import Modal from 'react-native-modal';
 
-import { getPolylineCoordinates } from '../utils';
+import * as actions from '../actions';
+import { getPolylineCoordinates, getBoundingBox } from '../utils';
 import ScoreBoard from '../components/Scoreboard';
 import Map from '../components/Map';
 
@@ -27,6 +28,8 @@ import Map from '../components/Map';
 //   {id: 5, latlng: {latitude: 50.1620886, longitude: 14.459883 }, title: 'Ořech', description: 'description', color: 'black'}
 // ];
 
+const QUIZ_COUNT = 3;
+
 class QuizScreen extends Component {
   static navigationOptions = {
     title: 'Kvíz',
@@ -36,13 +39,12 @@ class QuizScreen extends Component {
   }
 
   state = {
-    region: {
-      latitude: 50.1200885,
-      latitudeDelta: 0.0922,
-      longitude: 14.4597821,
-      longitudeDelta: 0.0421
-    },
-    data: DATA,
+    // region: {
+    //   latitude: 49.558454,
+    //   longitude: 14.80000,
+    //   latitudeDelta: 0.0182,
+    //   longitudeDelta: 0.0182
+    // },
     score: {
       correct: 0,
       total: 5
@@ -52,26 +54,35 @@ class QuizScreen extends Component {
     polylineCoordinates: null
   }
 
+  //TODO:
   // Nejprve zjistit jak se chová region, zda se mění když posouvám mapu. 
   // Dávalo by smysl ho dát do Reduxu a sdílet mezi MainScreen a QuizScreen.
   componentDidMount() {
-    //this.props.fetchQuizTrees()
-    this._nextTree();
+    this._fetchQuizTrees(() => this._nextTree());
   }
 
-  // _enterAnswer = () => {    
-  // }
+  _fetchQuizTrees = callback => {
+    let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
+    this.props.fetchQuizTrees(latMin, latMax, lonMin, lonMax, QUIZ_COUNT,
+      () => callback()
+    );
+  }
 
-  // _evualuteAnswer = () => {
-  // }
-  
+  _canQuizStart = () => {
+    return this.props.trees.length === QUIZ_COUNT ? true : false;
+  }
+
   _nextTree = () => {
+    console.log('nexTree fired');
     if(this.state.index <= this.props.trees.length - 1) {
+      console.log('true');
       const { location } = this.props.location;
    
       this.setState({destination: this.props.trees[this.state.index]}, () => {
-          getPolylineCoordinates(location, this.state.destination.latlng)
-                                .then( (polylineCoordinates) => this.setState( {polylineCoordinates}, () => this._incrementIndex() ));
+          let destinationLatLng = {latitude: this.state.destination.latitude, longitude: this.state.destination.longitude};
+          getPolylineCoordinates(location, destinationLatLng).then((polylineCoordinates) => this.setState({
+            polylineCoordinates
+          }, () => this._incrementIndex()));
       });
     }
   }
@@ -90,7 +101,7 @@ class QuizScreen extends Component {
   _renderMarkers = () => {
     return (
       <MapView.Marker
-        coordinate={this.state.destination.latlng} />
+        coordinate={{latitude: this.state.destination.latitude, longitude: this.state.destination.longitude  }} />
     )
   }
 
@@ -134,15 +145,16 @@ class QuizScreen extends Component {
   }
 
   render() {
-    if(this.state.data.length < 5)
-      return this._rederNoDataMessage()
-    if(!this.state.polylineCoordinates ||	!this.state.destination) {
+    if(!this.state.polylineCoordinates ||	!this.state.destination) 
       return (
         <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
           <ActivityIndicator size='large' />
         </View>
       )
-    }
+
+    if(!this._canQuizStart())
+      return this._rederNoDataMessage()
+
     return (
       <View style={styles.containerStyle}>
         <View style={{height:70}}>
@@ -153,7 +165,7 @@ class QuizScreen extends Component {
         </View>
           <Map
             mapStyle={{flex:1}} 
-            region={this.state.region}
+            region={this.props.region}
             showsUserLocation
             followUserLocation
             onUserLocationChange={this._handleUserLocationChange()}
@@ -187,12 +199,12 @@ const styles = {
   }
 }
 
-function mapStateToProps({location, quiz }) {
-  console.log(quiz);
+function mapStateToProps({location, quiz, region }) {
   return {
-    location: state.location,
-    trees: quiz
+    location: location,
+    trees: quiz,
+    region: region
   };
 }
 
-export default connect(mapStateToProps) (QuizScreen);
+export default connect(mapStateToProps, actions) (QuizScreen);

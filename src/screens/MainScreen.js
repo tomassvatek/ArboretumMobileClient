@@ -4,6 +4,7 @@ import { MapView } from 'expo';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
 import { getBoundingBox } from '../utils';
+import AutocompleteInput from '../components/AutocompleteInput';
 
 import * as actions from '../actions';
 import * as fab from '../helpers/fab';
@@ -18,6 +19,10 @@ const DATA = [
   {id: 4, latitude: 50.1500886, longitude: 14.459783, title: 'Kaštan', description: 'description', color: 'yellow'},
   {id: 5, latitude: 50.1600886, longitude: 14.459783, title: 'Ořech', description: 'description', color: 'black'}
 ];
+
+AUTOCOMPLETE_ITEMS = [
+  "Buk", "Javor"
+]
 
 class MainScreen extends Component {
   /**
@@ -50,30 +55,50 @@ class MainScreen extends Component {
 
   _setInitialRegion = (callback) => {
     let { location } = this.props.location;
-    this.setState({ 
-      region: {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.0182,
-        longitudeDelta: 0.0182
-      }
-    });
+    let region = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.0182,
+      longitudeDelta: 0.0182
+    }
+
+    this.props.regionChange(region);
     callback();
+
+
+
+    // this.setState({ 
+    //   region: {
+    //     latitude: location.latitude,
+    //     longitude: location.longitude,
+    //     latitudeDelta: 0.0182,
+    //     longitudeDelta: 0.0182
+    //   }
+    // });
   }
 
   _fetchTrees = () => {
-    let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.state.region);
+    let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
     this.props.fetchTrees(latMin, latMax, lonMin, lonMax, () => this.setState({fetchTreeCompleted: true}));
   }
 
+  onRegionChangeComplete = region => {
+      //console.log(`Updated region: ${region.latitude}`);
+      console.log('onRegionChangeComplete');
+  }
 
-  /**
-   * The callback method. The method is called after the user changes 
-   * the region, then the region state is updated.
-   */
-  _onRegionChangeComplete = region => {
-    this.setState({region});
-    console.log(this.state.region);
+  onRegionChange = region => {
+      // console.log(this.state.region);
+      // console.log(`Updated region: ${region.latitude}`);
+      // this.setState({
+      //   region: {
+      //     latitude: region.latitude,
+      //     longitude: region.longitude,
+      //     latitudeDelta: region.latitudeDelta,
+      //     longitudeDelta: region.longitudeDelta
+      //   }
+      // })
+      // this.setState({region}, () => console.log(this.state.region));
   }
 
 
@@ -127,12 +152,18 @@ class MainScreen extends Component {
     // console.log('Nearest button press');
     console.log(this.props.trees);
   }
-
+ 
   _handleFabItemNearestPress = () => {
     console.log('Nearest button press');
   }
 
-  _renderOverlay = () => <SearchInput/>
+  // _renderOverlay = () => <SearchInput/>
+  _renderOverlay = () => 
+      <AutocompleteInput 
+        autocompleteItems={AUTOCOMPLETE_ITEMS}
+        placeholder="Jaký strom hledáte?"
+  />
+
 
   _renderMarkers = markers => {
    return markers.map( marker => 
@@ -148,22 +179,23 @@ class MainScreen extends Component {
   }
 
   render() {
-    if(!this.state.region || !this.state.fetchTreeCompleted) {
-      return (
-        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size='large' />
-        </View>
-      )
-    }
+    // if(!this.props.region || !this.state.fetchTreeCompleted) {
+    //   return (
+    //     <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+    //       <ActivityIndicator size='large' />
+    //     </View>
+    //   )
+    // }
     return (
       <View style={styles.containerStyle}>
         <Map
           mapStyle={styles.mapStyle}
           overlayMapStyle={styles.overlayMapStyle}
           clustering
-          region={this.state.region}
+          region={this.props.region}
           onCalloutPress={(event) => this._handleCalloutPress(event)}
-          onRegionChangeComplete={this._onRegionChangeComplete}
+          onRegionChangeComplete={this.onRegionChangeComplete}
+          onRegionChange={this.onRegionChange}
           renderMarkers={this._renderMarkers(this.props.trees)}
         >
           {this._renderOverlay}
@@ -178,7 +210,7 @@ class MainScreen extends Component {
 
 const styles = {
   containerStyle: {
-    flex: 1
+    flex: 2
   },
 
   mapStyle: {
@@ -195,10 +227,13 @@ const styles = {
   }
 }
 
-function mapStateToProps({location, trees}) {
+function mapStateToProps(state) {
+  // console.log("App state:");
+  // console.log(state);
   return { 
-    location: location,
-    trees: trees
+    location: state.location,
+    trees: state.trees,
+    region: state.region
   }
 }
 

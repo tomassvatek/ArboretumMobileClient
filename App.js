@@ -16,7 +16,7 @@ import ModalTester from './src/screens/Modal';
 export default class App extends React.Component {
   render() {
     const MainNavigator = createBottomTabNavigator({
-      auth: {screen: AuthScreen},
+      // auth: {screen: AuthScreen},
       main: createBottomTabNavigator({
         main: createStackNavigator({
           main: {screen: MainScreen},

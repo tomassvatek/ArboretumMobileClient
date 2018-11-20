@@ -7,6 +7,7 @@ import { GET_TREES_EDNPOINT } from '../config';
 export const fetchTrees = (latMin, latMax, lonMin, lonMax, callback ) => async dispatch => {
     try {
         const url = replaceStringPlaceholders(GET_TREES_EDNPOINT, null, latMin, latMax, lonMin, lonMax);
+        console.log(`Get trees: ${url}`)
         let { data } = await axios.get(url);
         dispatch({type: FETCH_TREES, payload: data});
         callback();

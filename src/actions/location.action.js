@@ -12,11 +12,11 @@ export const getUserLocation = (callback) => async dispatch => {
         }
 
         let { coords } = await Location.getCurrentPositionAsync({});
-        let latLng = {
+        let coordinate = {
             latitude: coords.latitude,
             longitude: coords.longitude
         }
-        dispatch({ type: USER_LOCATION_CHANGE_SUCCESS, payload: latLng })
+        dispatch({ type: USER_LOCATION_CHANGE_SUCCESS, payload: coordinate })
         callback();
     }
     catch(error) {
