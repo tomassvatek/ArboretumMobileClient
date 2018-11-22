@@ -158,6 +158,7 @@ class MainScreen extends Component {
   _renderOverlay = () => 
       <AutocompleteInput 
         autocompleteItems={this.props.dendrologies}
+        filterProperty="commonName"
         placeholder="Jaký strom hledáte?"
   />
 

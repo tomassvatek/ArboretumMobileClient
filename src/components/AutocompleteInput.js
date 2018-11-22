@@ -14,10 +14,8 @@ class AutocompleteInput extends Component {
   }
 
   _filterData = (value) => {
-      console.log(this.props.autocompleteItems);
       if(value) {
-        console.log(value);
-        const filter = this.props.autocompleteItems.filter(i => i.toLowerCase().indexOf(value.toLowerCase()) === 0);
+        const filter = this.props.autocompleteItems.filter(i => i[this.props.filterProperty].toLowerCase().indexOf(value.toLowerCase()) === 0);
         const filteredData = filter.length > this.props.itemsCount ? filter.slice(0, this.props.itemsCount) : filter;
         this.setState({filteredData});
       } else {
@@ -31,7 +29,7 @@ class AutocompleteInput extends Component {
 
   _onItemPress = (item) => {
       this.setState({
-          query: item, 
+          query: item[this.props.filterProperty], 
           filteredData: []
       });
   }
@@ -59,7 +57,7 @@ class AutocompleteInput extends Component {
                 <TouchableOpacity 
                     style={styles.listItemStyle} 
                     onPress={() => this._onItemPress(item)}>
-                  <Text>{item}</Text>
+                  <Text>{item[this.props.filterProperty]}</Text>
                 </TouchableOpacity>
             )}
         />
@@ -115,20 +113,21 @@ const styles = {
         right: 0
     },
     iconContainerStyle: {
-        padding: 15,
-        //backgroundColor: 'red'
+        padding: 15
     }
 };
 
 AutocompleteInput.propTypes = {
     autocompleteItems: PropTypes.array.isRequired,
+    filterProperty: PropTypes.string.isRequired,
     itemsCount: PropTypes.number,
     placeholder: PropTypes.string
 }
 
 AutocompleteInput.defaultProps = {
     itemsCount: 5,
-    placeholder: ''
+    placeholder: '',
+    filterProperty: ''
 }
 
 export default AutocompleteInput;
