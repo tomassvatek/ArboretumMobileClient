@@ -11,6 +11,7 @@ import FilterScreen from './src/screens/FilterScreen';
 import MainScreen from './src/screens/MainScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import ModalTester from './src/screens/Modal';
+import TestScreen from './src/screens/geolocationTest';
 
 
 export default class App extends React.Component {
@@ -32,6 +33,7 @@ export default class App extends React.Component {
       <Provider store={store}>
           <MainNavigator/>
       </Provider>
+      // <TestScreen/>
     );
   }
 }

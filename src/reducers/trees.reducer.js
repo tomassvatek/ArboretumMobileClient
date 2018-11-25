@@ -1,13 +1,16 @@
-import { FETCH_TREES } from "../actions/types";
+import {
+    FETCH_TREES
+} from "../actions/types";
+import { addArrayWithouDuplicate } from "../utils";
 
-const INITIAL_STATE = [
-]
-
-export default function(state = INITIAL_STATE, action) {
-    switch(action.type) {
+//FIXME: Pokud jsem na poloze kde nejsou žádné stromy a změním polohu
+//       na místo, kde stromy jsou, data se načtou až po další změně polohy.
+export default function (treesState = [], action) {
+    switch (action.type) {
         case FETCH_TREES:
-            return action.payload;
+            const fetchTrees = addArrayWithouDuplicate(treesState, action.payload);
+            return treesState.concat(fetchTrees);
         default:
-            return state;
+            return treesState;
     }
 }

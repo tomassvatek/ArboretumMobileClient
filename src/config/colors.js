@@ -6,3 +6,4 @@ export const INPUT_COLOR = 'rgba(0,0,0,0.8)';
 export const INPUT_PLACEHOLDER_COLOR = 'rgba(0,0,0, 0.5)';
 export const TOOLBAR_TITLE_COLOR = 'rgba(255,255,255,1)';
 export const BORDER_COLOR = 'rgba(0,0,0,0.6)';
+export const ERROR_COLOR = '#C7272F';

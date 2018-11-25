@@ -6,12 +6,32 @@ import MapWithClustering  from 'react-native-map-clustering';
 import * as config from '../config';
 
 class Map extends Component {
+
+  componentDidMount() {
+    this.props.onRef(this);
+  }
+
+  componentWillUnmount() {
+    this.props.onRef(undefined);
+  }
+
+  //TODO: Animate to region vetsi vzdalenost
+  animateToRegion = (region) => {
+    setTimeout(() => {
+      this.mapClusterRef.root.animateToRegion(region, 500);
+    }, 500);
+  }
+
+  animateToCoordinate = (camera, duration) => {
+    this.mapClusterRef.root.animateToCoordinate(camera, duration);
+  }
+
   render() {
     return (
       <View style={{flex:1}}>
-        <MapWithClustering 
+        <MapWithClustering
+          ref={(ref) => this.mapClusterRef = ref}
           style={this.props.mapStyle} 
-          initialRegion={this.props.initialRegion}
           region={this.props.region}
           showsUserLocation={this.props.showsUserLocation}
           followsUserLocation={this.props.followsUserLocation}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { FETCH_QUIZ_TREES } from './types';
 import { replaceStringPlaceholders } from '../utils/replace-string-placeholders';
-import { GET_CLOSEST_TREE_ENDPOINT } from '../config';
+import { GET_CLOSEST_TREE_ENDPOINT } from '../api/constants';
 
 export const fetchQuizTrees = (latMin, latMax, lonMin, lonMax, count, callback ) => async dispatch => {
     try {

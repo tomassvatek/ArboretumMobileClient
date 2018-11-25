@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
-import { Platform, View, ActivityIndicator } from 'react-native'
+import { Platform, View, ActivityIndicator, NetInfo } from 'react-native'
 import { MapView } from 'expo';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
-import { getBoundingBox } from '../utils';
-import AutocompleteInput from '../components/AutocompleteInput';
+import { getBoundingBox, calculateDistance } from '../utils';
+import AutocompleteInput from '../components/autocomplete-input';
+import Offline from '../components/Offline';
+import * as statusBar from '../styles/status-bar.style';
 
 import * as actions from '../actions';
 import * as fab from '../helpers/fab';
 import Map from '../components/Map';
+import { fetchClosestTreeByDendrology } from '../api/fetch-closest-tree-by-dendrology';
 
 // MOCK DATA
 const DATA = [
@@ -37,56 +40,71 @@ class MainScreen extends Component {
 
   static navigationOptions = {
     header: null,
-    title: 'Mapa'
+    title: 'Mapa',
+    statusBarStyle: 'light-content'
   }
 
   state = {
-    fetchTreeCompleted: false
-  };
+    query: ""
+  }
+
 
   componentDidMount() {
+    NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionStatusChange);
     if(Platform.OS === 'android') {
-      this._setInitialRegion(() => this._fetchTrees());
+      // this._setInitialRegion(() => this._fetchTrees());
+      this.props.getUserLocation(() => { 
+        this._fetchTrees()
+      });
+      this._watchPositionAsync();
       this._fetchDendrologies();
     }
   }
 
-  _isReadyToRender = () => {
-    //console.log(`${this.props.trees.length} ${this.props.dendrologies.length} ${this.props.region}`);
-    return this.props.trees.length !== 0 && this.props.dendrologies.length !== 0
-           && this.props.region ? true : false;
+  componentWillUnmount() {
+    console.log("MainScreen unmount");
+    NetInfo.isConnected.removeEventListener('connectionChange', this._handleConnectionStatusChange);
   }
 
-  _setInitialRegion = (callback) => {
-    this.props.getUserLocation(() => {
-      let { location } = this.props.location;
-      let region = {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.0182,
-        longitudeDelta: 0.0182
-      }
-
-      this.props.regionChange(region);
-      callback();
+  _watchPositionAsync = () => {
+    this.props.watchPosition(20, (coordinate) => {
+         console.log("[MainScreen._watchPosition] Position changed succesfully");
+         this._fetchTrees();
+         this.mapRef && this.mapRef.animateToRegion(this.props.region);
     })
   }
 
+  _isReadyToRender = () => {
+    return this.props.region ? true : false;
+  }
+
+  // _setInitialRegion = (callback) => {
+  //   console.log("set initial region");
+  //   this.props.getUserLocation((coordinate) => {
+  //     //let { currentLocation } = this.props.currentLocation;
+  //     let region = {
+  //       latitude: coordinate.latitude,
+  //       longitude: coordinate.longitude,
+  //       latitudeDelta: 0.0182,
+  //       longitudeDelta: 0.0182
+  //     }
+
+  //     this.props.regionChange(region);
+  //     callback();
+  //   })
+  // }
+
   _fetchTrees = () => {
     let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
-    this.props.fetchTrees(latMin, latMax, lonMin, lonMax, () => this.setState({fetchTreeCompleted: true}));
+    this.props.fetchTrees(latMin, latMax, lonMin, lonMax);
   }
 
   _fetchDendrologies = () => {
     this.props.fetchDendrologies();
   }
 
-  onRegionChangeComplete = region => {
-      //console.log(`Updated region: ${region.latitude}`);
-      console.log('onRegionChangeComplete');
-  }
-
   onRegionChange = region => {
+    //console.log(region);
       // console.log(this.state.region);
       // console.log(`Updated region: ${region.latitude}`);
       // this.setState({
@@ -98,7 +116,13 @@ class MainScreen extends Component {
       //   }
       // })
       // this.setState({region}, () => console.log(this.state.region));
+      // console.log(region);
+      // this.props.regionChange({region});
   }
+
+  // _checkNetworkStatus = () => {
+  //   NetI
+  // }
 
 
   /**
@@ -107,6 +131,10 @@ class MainScreen extends Component {
    */
   _handleSerchInputPress = () => {
     this.props.navigation.navigate('filter');
+  }
+
+  _handleConnectionStatusChange = (isConnected) => {
+    this.props.changeConnectionStatus(isConnected);
   }
 
 
@@ -148,20 +176,45 @@ class MainScreen extends Component {
 
 
   _handleFabItemMyPositionPress = () => {
-    console.log('Nearest button press');
+    const region =  {
+      latitude: 45.78825,
+      longitude: 18.4324,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    }
+
+    this.mapRef.animateToRegion(region);
   }
  
   _handleFabItemNearestPress = () => {
     console.log('Nearest button press');
   }
 
-  _renderOverlay = () => 
-      <AutocompleteInput 
-        autocompleteItems={this.props.dendrologies}
-        filterProperty="commonName"
-        placeholder="Jaký strom hledáte?"
-  />
+  _findTreeByDendrology = (dendrologyId) => {
+    fetchClosestTreeByDendrology(dendrologyId).then(
+      ({latitude, longitude}) => this.mapRef.animateToCoordinate({latitude, longitude}, 0),
+      (error) => console.log(error)
+    )
+  }
 
+  // _onItemPress = (item) => {
+  //   this.setState({query: item});
+  // }
+
+  _onIconButtonPress = (item) => {
+    this._findTreeByDendrology(item.id);
+  }
+
+  _renderOverlay = () => 
+      <AutocompleteInput
+        autocompleteItems={this.props.dendrologies}
+        onItemPress={(item) => this._onItemPress(item)}
+        filterProperty="commonName"
+        displayProperty="commonName"
+        iconButton
+        placeholder="Jaký strom hledáte?"
+        onIconButtonPress={this._onIconButtonPress}
+  />
 
   _renderMarkers = markers => {
    return markers.map( marker => 
@@ -186,15 +239,16 @@ class MainScreen extends Component {
     }
     return (
       <View style={styles.containerStyle}>
+        <View style={statusBar.style.statusBar}></View>
+        <Offline isVisible={!this.props.networkStatus}/>
         <Map
+          onRef={(ref) => this.mapRef = ref}
           mapStyle={styles.mapStyle}
           overlayMapStyle={styles.overlayMapStyle}
           clustering
           region={this.props.region}
           onCalloutPress={(event) => this._handleCalloutPress(event)}
-          onRegionChangeComplete={this.onRegionChangeComplete}
-          onRegionChange={this.onRegionChange}
-          renderMarkers={this._renderMarkers(this.props.trees)}
+          renderMarkers={ this._renderMarkers(this.props.trees)}
         >
           {this._renderOverlay}
         </Map>
@@ -215,9 +269,10 @@ const styles = {
     flex: 1
   },
 
+
   overlayMapStyle: {
     position: 'absolute',
-    top: 70,
+    top: 20,
     left: 0,
     right: 0,
     marginRight: 20,
@@ -226,11 +281,14 @@ const styles = {
 }
 
 function mapStateToProps(state) {
+  console.log(`${Date.now()} trees update`);
+  console.log(state.trees);
   return { 
-    location: state.location,
+    currentLocation: state.location.currentLocation,
     trees: state.trees,
     dendrologies: state.dendrologies,
-    region: state.region
+    region: state.location.currentRegion,
+    networkStatus: state.networkStatus
   }
 }
 

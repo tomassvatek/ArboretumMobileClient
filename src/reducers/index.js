@@ -3,8 +3,8 @@ import location from './location.reducer';
 import trees from './trees.reducer';
 import treeDetail from './tree-detail.reducer';
 import quiz from './quiz.reducer';
-import region from './map-region.reducer';
 import dendrologies from './dendrologies.reducer';
+import networkStatus from './network-connection.reducer';
 
 export default combineReducers({
     location,
@@ -12,5 +12,5 @@ export default combineReducers({
     dendrologies,
     treeDetail,
     quiz,
-    region
+    networkStatus
 });

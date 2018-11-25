@@ -1,15 +1,33 @@
 import React, { Component } from 'react';
 import { Text, View, ActivityIndicator } from 'react-native';
 import {Icon, Button} from 'react-native-elements';
-import { MapView } from 'expo'
+import { MapView, Constants  } from 'expo'
 import { connect } from 'react-redux';
-import geolib from 'geolib';
+// import geolib from 'geolib';
 import Modal from 'react-native-modal';
 
+import AutocompleteInput from '../components/autocomplete-input';
 import * as actions from '../actions';
-import { getPolylineCoordinates, getBoundingBox } from '../utils';
+import * as modal from '../styles/modal.style';
+import { getPolylineCoordinates, getBoundingBox, calculateDistance } from '../utils';
 import ScoreBoard from '../components/Scoreboard';
 import Map from '../components/Map';
+import { PRIMARY_DARK_COLOR } from '../config';
+
+const DATA = [
+  {
+    commonName: "buk"
+  },
+  {
+    commonName: "buk"
+  },
+  {
+    commonName: "buk"
+  },
+  {
+    commonName: "javor"
+  }
+]
 
 /**
  * TODO:
@@ -39,27 +57,25 @@ class QuizScreen extends Component {
   }
 
   state = {
-    // region: {
-    //   latitude: 49.558454,
-    //   longitude: 14.80000,
-    //   latitudeDelta: 0.0182,
-    //   longitudeDelta: 0.0182
-    // },
     score: {
       correct: 0,
       total: 5
     },
     index: 0,
-    destination: null,
-    polylineCoordinates: null
+    destination: {
+      latitude: 0,
+      longitude: 0
+    },
+    polylineCoordinates: null,
+    isModalVisible: false,
+    answer: ''
   }
 
-  //TODO:
-  // Nejprve zjistit jak se chová region, zda se mění když posouvám mapu. 
-  // Dávalo by smysl ho dát do Reduxu a sdílet mezi MainScreen a QuizScreen.
   componentDidMount() {
-    this._fetchQuizTrees(() => this._nextTree());
+    this._fetchQuizTrees(() =>  this._startQuiz());
+    this._watchPositionAsync();
   }
+
 
   _fetchQuizTrees = callback => {
     let [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
@@ -72,30 +88,27 @@ class QuizScreen extends Component {
     return this.props.trees.length === QUIZ_COUNT ? true : false;
   }
 
-  _nextTree = () => {
-    console.log('nexTree fired');
+  _startQuiz = () => {
     if(this.state.index <= this.props.trees.length - 1) {
-      console.log('true');
       const { location } = this.props.location;
-   
-      this.setState({destination: this.props.trees[this.state.index]}, () => {
-          let destinationLatLng = {latitude: this.state.destination.latitude, longitude: this.state.destination.longitude};
-          getPolylineCoordinates(location, destinationLatLng).then((polylineCoordinates) => this.setState({
-            polylineCoordinates
-          }, () => this._incrementIndex()));
-      });
+      this.setState({destination: this.props.trees[this.state.index]}, () => 
+      {
+          let destinationLatLng = {
+            latitude: this.state.destination.latitude, 
+            longitude: this.state.destination.longitude
+          };
+
+          getPolylineCoordinates(location, destinationLatLng).then(polylineCoordinates => 
+            this.setState({
+              polylineCoordinates
+            }, () => this._incrementIndex())
+         )
+      })
     }
   }
 
   _incrementIndex = () => {
-    this.setState((prevState) => ({index: prevState.index + 1}));
-  }
-
-  _calculateDistance = () => {
-    const { location } = this.props.location;
-
-    let distance = geolib.getDistance(location, this.state.destination);
-    console.log(`Distance between origin: [${location.latitude}, ${location.longitude}] and destination: [${this.state.destination.latng.latitude}, ${this.state.destination.latng.longitude}] is ${distance} meters.`);
+    this.setState(prevState => ({index: prevState.index + 1}));
   }
 
   _renderMarkers = () => {
@@ -126,22 +139,77 @@ class QuizScreen extends Component {
     )
   }
 
+  _updateScore = () => {
+    if (this._evualateAnswer()) {
+      this.setState(prevState => ({
+          score: {
+            ...prevState.score,
+            correct: prevState.score.correct + 1,
+            total: prevState.score.total - 1
+          }
+        }),
+        () => this._startQuiz())
+    }
+    this.setState({
+      isModalVisible: false
+    });
+  }
+
+  _evualateAnswer = () => {
+    console.log(this.state.destination);
+    const correctAnswer = this.state.destination.dendrology.commonName.toLowerCase();
+    const userAnswer = this.state.answer.toLowerCase();
+    
+    return userAnswer == correctAnswer ? true : false;
+  }
+
+  _onItemPress = (item) => {
+    this.setState({answer: item.commonName});
+  }
+
   _renderModal = () => {
     return (
       <Modal
-        animationType='slide'
-        transparent={false}
-        visible={true}
+        style={modal.style.modalStyle}
+        isVisible={this.state.isModalVisible}
+        onBackdropPress={() => this._toggleModal()}
       >
-        <View style={styles.modalContent}>
-          <Text>Hello</Text>
+      <View style={modal.style.modalContentStyle}>
+        <View style={modal.style.autocomplete}>
+          <AutocompleteInput
+            autocompleteItems={this.props.dendrologies}
+            query={this.state.answer}
+            onItemPress={(item) => this._onItemPress(item)}
+            filterProperty="commonName"
+            placeholder="Zadej odpověď"
+          />
         </View>
+          <Button title="Potvrdit odpověď" 
+            onPress={() => this._updateScore()}/>
+      </View>
       </Modal>
     )
   }
 
-  _handleUserLocationChange = () => {
-    console.log('position change');
+  _toggleModal = () => {
+    this.setState({ isModalVisible: !this.state.isModalVisible });
+  }
+
+  // _calculateDistance = () => {
+  //   const { location } = this.props.location;
+  //   console.log(`CALCULATE DISTANCE LOCATION  ${location.latitude} ${location.longitude}`);
+  //   console.log(`CALCULATE DISTANCE DESTINATION  ${this.state.destination.latitude} ${this.state.destination.longitude}`);
+
+  //   let distance = geolib.getDistance(location, this.state.destination);
+  //   console.log(`Distance between origin: [${location.latitude}, ${location.longitude}] and destination: [${this.state.destination.latitude}, ${this.state.destination.longitude}] is ${distance} meters.`);
+  //   return distance;
+  // }
+
+  _watchPositionAsync = () => {
+    this.props.watchPosition((coordinate) => {
+         const distance = calculateDistance(coordinate, this.state.destination);
+         distance < 500 ? this.setState({isModalVisible: true}) : null;
+    })
   }
 
   render() {
@@ -156,6 +224,8 @@ class QuizScreen extends Component {
       return this._rederNoDataMessage()
 
     return (
+      <View style={{flex: 1}}>
+        <View style={styles.statusBar}></View>
       <View style={styles.containerStyle}>
         <View style={{height:70}}>
           <ScoreBoard 
@@ -168,21 +238,14 @@ class QuizScreen extends Component {
             region={this.props.region}
             showsUserLocation
             followUserLocation
-            onUserLocationChange={this._handleUserLocationChange()}
+            // onUserLocationChange={() => this._handleUserLocationChange()}
             renderMarkers={this._renderMarkers()}
             renderPolyline={this._renderPolyline()}
           >
           </Map>
-          <Button title='Increment' onPress={() => this._nextTree()}></Button>
-          {/* <View>
-            <Modal
-              isVisible
-            >
-              <View style={{flex:1}}>
-                <Text>Hello MODAL</Text>
-              </View>
-            </Modal>
-        </View> */}
+          <Button title='Increment' onPress={() => this._toggleModal()}></Button>
+          {this._renderModal()}
+      </View>
       </View>
     )
   }
@@ -192,18 +255,23 @@ const styles = {
   containerStyle: {
     flex: 1,
     // REFACTOR STATUS BAR
-    marginTop: 25
+    //marginTop: 25
   },
   modalContent: {
     flex: 1
+  },
+  statusBar: {
+    backgroundColor: PRIMARY_DARK_COLOR,
+    height: Constants.statusBarHeight,
   }
 }
 
-function mapStateToProps({location, quiz, region }) {
+function mapStateToProps({location, quiz, region, dendrologies }) {
   return {
-    location: location,
+    location: location.currentLocation,
     trees: quiz,
-    region: region
+    region: location.currentRegion,
+    dendrologies: dendrologies
   };
 }
 

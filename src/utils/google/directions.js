@@ -15,9 +15,7 @@ export const getPolylineCoordinates = async (origin, destination) => {
     console.log(destination);
     try {
         const url = buildDirectionsUrl(origin, destination);
-        console.log(`GetPolylineCoordinates: ${url}`);
         let { data } = await axios.get(url);
-        console.log(data);
         let points = Polyline.decode(data.routes[0].overview_polyline.points);
         let coords = points.map(point => {
             return {

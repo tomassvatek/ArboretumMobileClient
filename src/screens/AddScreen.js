@@ -17,9 +17,9 @@ class AddScreen extends Component {
   }
 
   _setAddress = () => {
-    if(this.props.location) {
-      let { location } = this.props.location;
-      let { latitude, longitude } = location;
+    if(this.props.currentLocation) {
+      // let { location } = this.props.currentLocation;
+      let { latitude, longitude } = this.props.currentLocation;
       reverseGeocode(latitude, longitude).then((address) => {
         this.setState({address});
       })
@@ -97,9 +97,9 @@ const styles = {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps({location}) {
   return {
-    location: state.location
+    currentLocation: location.currentLocation
   };
 }
 

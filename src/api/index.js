@@ -1,0 +1,1 @@
+export * from 'fetch-closest-tree-by-dendrology';
