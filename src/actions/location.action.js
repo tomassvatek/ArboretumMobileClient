@@ -2,7 +2,7 @@ import { Permissions, Location } from 'expo';
 import {
     USER_LOCATION_CHANGE_FAILURE,
     USER_LOCATION_CHANGE_SUCCESS
-} from './types';
+} from './redux-action-types';
 
 export const getUserLocation = (callback) => async dispatch => {
     try {
@@ -31,7 +31,7 @@ export const watchPosition = (distanceInterval = 50, callback) => async dispatch
                 latitude: coords.coords.latitude,
                 longitude: coords.coords.longitude
             }
-            console.log(`[location.action.watchPostion] New location: ${coordinate.latitude} ${coordinate.longitude}`)
+            // console.log(`[location.action.watchPostion] New location: ${coordinate.latitude} ${coordinate.longitude}`)
             dispatch({type: USER_LOCATION_CHANGE_SUCCESS, payload: coordinate});
             typeof callback === 'function' && callback(coordinate);
         })

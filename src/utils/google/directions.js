@@ -12,7 +12,6 @@ const GOOGLE_API_KEY = 'AIzaSyAeTR9DniCDMtCLdcYKtZ-TUH3JSPFVjuY';
  * @param {latng} destination 
  */
 export const getPolylineCoordinates = async (origin, destination) => {
-    console.log(destination);
     try {
         const url = buildDirectionsUrl(origin, destination);
         let { data } = await axios.get(url);
@@ -23,6 +22,7 @@ export const getPolylineCoordinates = async (origin, destination) => {
                 longitude: point[1]
             }
         })
+
         return coords;
 
     } catch(err) {

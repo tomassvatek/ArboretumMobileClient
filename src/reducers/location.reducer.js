@@ -1,7 +1,7 @@
 import {
     USER_LOCATION_CHANGE_SUCCESS,
     USER_LOCATION_CHANGE_FAILURE
-} from '../actions/types';
+} from '../actions/redux-action-types';
 
 INITIAL_STATE = {
     currentLocation: {

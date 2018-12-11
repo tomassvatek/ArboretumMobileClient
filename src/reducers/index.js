@@ -5,6 +5,7 @@ import treeDetail from './tree-detail.reducer';
 import quiz from './quiz.reducer';
 import dendrologies from './dendrologies.reducer';
 import networkStatus from './network-connection.reducer';
+import notification from './notification.reducer';
 
 export default combineReducers({
     location,
@@ -12,5 +13,6 @@ export default combineReducers({
     dendrologies,
     treeDetail,
     quiz,
-    networkStatus
+    networkStatus,
+    notification
 });

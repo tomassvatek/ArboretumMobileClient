@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Text, View, TouchableOpacity, Keyboard } from 'react-native'
+import React, { Component } from 'react';
+import { Text, View, TouchableOpacity, Keyboard } from 'react-native';
 import PropTypes from 'prop-types';
 
 import {Icon} from 'react-native-elements';
@@ -30,6 +30,7 @@ class AutocompleteInput extends Component {
 
   _onChangeText = (value) => {
       this._filterData(value);
+      typeof this.props.onChangeText === 'function' && this.props.onChangeText(value);
   }
 
   //TODO: check if funkce byla vlozena
@@ -38,6 +39,8 @@ class AutocompleteInput extends Component {
           currentItem: item,
           filteredData: []
       });
+
+      typeof this.props.onItemPress === 'function' && this.props.onItemPress(item);
   }
 
   _onIconButtonPress = (item) => {
@@ -75,7 +78,7 @@ class AutocompleteInput extends Component {
             data={this.state.filteredData}
             underlineColorAndroid='transparent'
             // containerStyle={styles.autocompleteStyle.containerStyle}
-            containerStyle={styles.autocompleteStyle.containerStyle}
+            containerStyle={this.props.autocompleteContainerStyle}
             inputContainerStyle={[styles.autocompleteStyle.inputContainerStyle, this.state.filteredData.length === 0 ? {} : styles.autocompleteStyle.listOpenStyle ]}
             listContainerStyle={styles.autocompleteStyle.listContainerStyle}
             listStyle={styles.autocompleteStyle.listStyle}

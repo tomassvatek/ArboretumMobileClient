@@ -1,6 +1,6 @@
 import {
     FETCH_TREES
-} from "../actions/types";
+} from "../actions/redux-action-types";
 import { addArrayWithouDuplicate } from "../utils";
 
 //FIXME: Pokud jsem na poloze kde nejsou žádné stromy a změním polohu

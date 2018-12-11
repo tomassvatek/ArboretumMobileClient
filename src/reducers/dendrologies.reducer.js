@@ -1,4 +1,4 @@
-import { FETCH_DENDROLOGIES } from "../actions/types";
+import { FETCH_DENDROLOGIES } from "../actions/redux-action-types";
 
 export default function(state = [], action) {
     switch(action.type) {

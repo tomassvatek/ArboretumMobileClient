@@ -5,7 +5,7 @@ import MapWithClustering  from 'react-native-map-clustering';
 
 import * as config from '../config';
 
-class Map extends Component {
+export default class Map extends Component {
 
   componentDidMount() {
     this.props.onRef(this);
@@ -83,5 +83,3 @@ Map.defaultProps = {
   renderMarkers: <View/>,
   renderPolyline: <View/>
 }
-
-export default Map;

@@ -1,4 +1,4 @@
-import { CONNECTION_STATUS_CHANGE } from "../actions/types";
+import { CONNECTION_STATUS_CHANGE } from "../actions/redux-action-types";
 
 
 

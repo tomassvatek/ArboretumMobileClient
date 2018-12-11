@@ -24,8 +24,6 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 10,
-        borderWidth: 1,
-        borderColor: 'black',
     },
     correctStyle: {
         fontSize: 17,

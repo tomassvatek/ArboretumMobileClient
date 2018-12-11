@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { FETCH_TREES } from './types';
+import { FETCH_TREES } from './redux-action-types';
 import { replaceStringPlaceholders } from '../utils/replace-string-placeholders';
-import { GET_TREES_EDNPOINT } from '../api/constants';
+import { GET_TREES_EDNPOINT } from '../services/http/constants';
 
 export const fetchTrees = (latMin, latMax, lonMin, lonMax, callback ) => async dispatch => {
     try {

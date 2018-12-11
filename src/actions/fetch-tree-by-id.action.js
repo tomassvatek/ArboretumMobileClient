@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { replaceStringPlaceholders } from "../utils/replace-string-placeholders";
-import { FETCH_TREE_DETAIL } from "./types";
-import { GET_TREE_BY_ID_ENDPOINT } from '../api/constants';
+import { FETCH_TREE_DETAIL } from "./redux-action-types";
+import { GET_TREE_BY_ID_ENDPOINT } from '../services/http/constants';
 
 export const fetchTreeById = (treeId, providerId, callback) => async dispatch => {
     try {
         const url = replaceStringPlaceholders(GET_TREE_BY_ID_ENDPOINT, null, treeId, providerId);
+        console.log(url);
         let { data } = await axios.get(url);
         dispatch({type: FETCH_TREE_DETAIL, payload: data});
         callback();
