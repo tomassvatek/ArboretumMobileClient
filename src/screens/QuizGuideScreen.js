@@ -97,7 +97,6 @@ class QuizGuideScreen extends Component {
     }
 }
 
-
 const styles = {
     slideStyle: {
         flex: 1,

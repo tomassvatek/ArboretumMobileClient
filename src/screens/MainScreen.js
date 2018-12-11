@@ -74,7 +74,6 @@ class MainScreen extends Component {
 
   _startNavigationMode = () => {
     const { latitude, longitude } = this.state.currentCallout;
-    console.log(this.state.currentCallout);
     this._fetchNavigationRoad({latitude, longitude});
     this.props.showNotification({
       type: TREE_NAVIGATION_CANCEL,
@@ -97,7 +96,6 @@ class MainScreen extends Component {
 
   _watchPositionAsync = () => {
     this.props.watchPosition(20, (coordinate) => {
-         console.log("[MainScreen._watchPosition] Position changed succesfully");
          this._fetchTrees();
          this.mapRef && this.mapRef.animateToRegion(this.props.region);
     });
@@ -106,7 +104,6 @@ class MainScreen extends Component {
   //FIXME: Vykreslí se až po druhém setState
   // Initial state?
   _fetchNavigationRoad = (destination) => {
-    console.log(destination);
     getPolylineCoordinates(this.props.currentLocation, destination)
     .then(
       (polylineCoordinates) => {

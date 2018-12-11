@@ -49,11 +49,11 @@ class LearningScreen extends Component {
     return (
       <Card title="All done">
         <Text style={{marginBottom: 10}}>
-          There is no more cards here!;
+          Chceš vidět další stromy?
         </Text>
         <Button
           backgroundColor={PRIMARY_COLOR}
-          title="Get more!"
+          title="Nové stromy"
           onPress={() => this._getMoreCards()}
         />
       </Card>

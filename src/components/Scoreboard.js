@@ -24,6 +24,7 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 10,
+        backgroundColor: '#fff'
     },
     correctStyle: {
         fontSize: 17,
@@ -36,7 +37,7 @@ const styles = {
 
 Scoreboard.propTypes = {
     correct: PropTypes.number.isRequired,
-    total: PropTypes.number.isRequired
+    total: PropTypes.isRequired
 }
 
 

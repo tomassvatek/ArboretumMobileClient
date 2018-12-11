@@ -12,8 +12,10 @@ export const FAB_ACTIONS = [{
       text: 'Strom v blízkosti',
       name: FAB_ACTION_NEAREST,
       position: 2,
-    }, {
-      text: 'Přidat strom',
-      name: FAB_ACTION_ADD,
-      position: 3
-  }]
+      }
+  //   }, {
+  //     text: 'Přidat strom',
+  //     name: FAB_ACTION_ADD,
+  //     position: 3
+  // }]
+  ]

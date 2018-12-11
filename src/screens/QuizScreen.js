@@ -12,31 +12,10 @@ import { getPolylineCoordinates, getBoundingBox, calculateDistance } from '../ut
 import ScoreBoard from '../components/scoreboard';
 import Map from '../components/custom-map';
 import { PRIMARY_DARK_COLOR, BORDER_COLOR, SECONDARY_COLOR } from '../config';
-
-const DATA = [
-  {
-    commonName: "buk"
-  },
-  {
-    commonName: "buk"
-  },
-  {
-    commonName: "buk"
-  },
-  {
-    commonName: "javor"
-  }
-]
-
-/**
- * TODO:
- * modal 
- * tracking location
- * evualate answer
- * 
- */
+import { MAIN_SCREEN } from '../config/screen-routes';
 
 const QUIZ_COUNT = 3;
+const DISTANCE_THRESHOLD = 10;
 
 class QuizScreen extends Component {
   static navigationOptions = {
@@ -46,7 +25,7 @@ class QuizScreen extends Component {
   state = {
     score: {
       correct: 0,
-      total: 5
+      total: this.props.navigation.getParam('treeCount')
     },
     index: 0,
     destination: {},
@@ -54,7 +33,8 @@ class QuizScreen extends Component {
     isModalVisible: false,
     isButtonVisible: false,
     answer: {},
-    quizEnd: true
+    quizEnd: false,
+    count: this.props.navigation.getParam('treeCount')
   }
 
   componentDidMount() {
@@ -63,34 +43,22 @@ class QuizScreen extends Component {
   }
 
 
-  // _fetchQuizTrees = callback => {
-  //   const [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
-  //   this.props.fetchQuizTrees(latMin, latMax, lonMin, lonMax, QUIZ_COUNT,
-  //     () => callback()
-  //   );
-  // }
-
   _canQuizStart = () => {
     return this.props.trees.length === QUIZ_COUNT ? true : false;
   }
 
   _watchPositionAsync = () => {
-    this.props.watchPosition((coordinate) => {
+    this.props.watchPosition(20, (coordinate) => {
          const distance = calculateDistance(coordinate, this.state.destination);
-         distance < 500 ? this.setState({isModalVisible: true}) : null;
+         distance < DISTANCE_THRESHOLD ? this.setState({isModalVisible: true}) : null;
     })
   }
 
   _startQuiz = () => {
-    console.log("Current tree");
-    console.log(this.state.destination);
     if(this.state.index <= this.props.trees.length - 1) {
-      const { location } = this.props.location;
-      console.log(this.state.index);
-      console.log(this.props.trees);
       this.setState({destination: this.props.trees[this.state.index]}, () => 
       {
-          let destinationLatLng = {
+          const destinationLatLng = {
             latitude: this.state.destination.latitude, 
             longitude: this.state.destination.longitude
           };
@@ -132,32 +100,50 @@ class QuizScreen extends Component {
 //TODO: Pripad ze neni odpoved spravna
   _updateScore = () => {
     if (this._evualateAnswer()) {
-      this.setState(prevState => ({
-          score: {
-            ...prevState.score,
-            correct: prevState.score.correct + 1,
-            total: prevState.score.total - 1
-          }
-        }),
-        () => this._startQuiz())
-    } else {
-      this.setState(prevState => ({
-        score: {
-          ...prevState.score,
-          total: prevState.score.total - 1
-        }
-      }),
-      () => this._startQuiz())
+      this._handleCorrectAnswer();
+    } 
+    else {
+      this._handleWrongAnswer();
     }
-    console.log("false");
     this.setState({
       isModalVisible: false
     });
   }
 
+  _handleCorrectAnswer = () => {
+    this.setState(prevState => ({
+      score: {
+        ...prevState.score,
+        correct: prevState.score.correct + 1,
+        total: prevState.score.total - 1
+      }
+    }),
+    () => {
+      this._isLastQuizItem();
+      this._startQuiz(); 
+    })
+  }
+
+  _handleWrongAnswer = () => {
+    this.setState(prevState => ({
+      score: {
+        ...prevState.score,
+        total: prevState.score.total - 1
+      }
+    }),
+    () => { 
+      this._isLastQuizItem();
+      this._startQuiz(); 
+    })
+  }
+
+  _isLastQuizItem = () => {
+    if(this.state.score.total == 0) {
+      this.setState({quizEnd: true})
+     }
+  }
+
   _evualateAnswer = () => {
-    console.log("user answer");
-    console.log(this.state.userAnswer);
     const correctAnswer = this.state.destination.commonName.toLowerCase();
     const userAnswer = this.state.answer.commonName.toLowerCase();
 
@@ -166,13 +152,11 @@ class QuizScreen extends Component {
   }
 
   _onItemPress = (item) => {
-    console.log(item);
     this.setState({answer: item, isButtonVisible: true});
   }
 
   onChangeText = (value) => {
     this.setState({isButtonVisible: false});
-    //this.setState({answer: {}});
   }
 
   _renderModal = () => {
@@ -187,6 +171,7 @@ class QuizScreen extends Component {
           <AutocompleteInput
             autocompleteContainerStyle={styles.autocompleteContainerStyle}
             autocompleteItems={this.props.dendrologies}
+            itemsCount={3}
             filterProperty="commonName"
             displayProperty="commonName"
             placeholder="Zadej odpověď"
@@ -211,19 +196,17 @@ class QuizScreen extends Component {
     return (
     <Modal
       style={modal.style.modalStyle}
-      isVisible={false}
-      onBackdropPress={() => this._toggleModal()}
+      isVisible={this.state.quizEnd}
     >
-    <View style={modal.style.modalContentStyle}>
-        <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text>Dokončil jsi kvíz se skore.</Text>
+    <View style={[modal.style.modalContentStyle, {justifyContent: 'center', alignItems: 'center', padding: 20}]}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Text>Dokončil jsi kvíz. Dokázal jsi rozeznat {this.state.score.correct} stromů z celkových {this.state.count}.</Text>
         </View>
         <Button 
-          title="Potvrdit odpověď" 
-          icon={{name: 'done'}}
+          title="Konec" 
           backgroundColor={SECONDARY_COLOR}
-          buttonStyle={modal.style.buttonStyle}
-          onPress={() => this._updateScore()}/>
+          buttonStyle={{borderRadius: 10, marginTop: 15}}
+          onPress={() => this._handleQuizEnd()}/>
       </View>
     </Modal>
     )
@@ -233,22 +216,10 @@ class QuizScreen extends Component {
     this.setState({ isModalVisible: !this.state.isModalVisible });
   }
 
-  // _calculateDistance = () => {
-  //   const { location } = this.props.location;
-  //   console.log(`CALCULATE DISTANCE LOCATION  ${location.latitude} ${location.longitude}`);
-  //   console.log(`CALCULATE DISTANCE DESTINATION  ${this.state.destination.latitude} ${this.state.destination.longitude}`);
-
-  //   let distance = geolib.getDistance(location, this.state.destination);
-  //   console.log(`Distance between origin: [${location.latitude}, ${location.longitude}] and destination: [${this.state.destination.latitude}, ${this.state.destination.longitude}] is ${distance} meters.`);
-  //   return distance;
-  // }
-
-  // _watchPositionAsync = () => {
-  //   this.props.watchPosition((coordinate) => {
-  //        const distance = calculateDistance(coordinate, this.state.destination);
-  //        distance < 500 ? this.setState({isModalVisible: true}) : null;
-  //   })
-  // }
+  _handleQuizEnd = () => {
+    this.props.navigation.navigate(MAIN_SCREEN);
+    this.setState({quizEnd: false});
+  }
 
   render() {
     if(!this.state.polylineCoordinates ||	!this.state.destination) 
@@ -273,12 +244,10 @@ class QuizScreen extends Component {
             region={this.props.region}
             showsUserLocation
             followUserLocation
-            // onUserLocationChange={() => this._handleUserLocationChange()}
             renderMarkers={this._renderMarkers()}
             renderPolyline={this._renderPolyline()}
           >
           </Map>
-          <Button title='Increment' onPress={() => this._toggleModal()}></Button>
           {this._renderModal()}
           {this._renderQuizEnd()}
       </View>
@@ -290,8 +259,6 @@ class QuizScreen extends Component {
 const styles = {
   containerStyle: {
     flex: 1,
-    // REFACTOR STATUS BAR
-    //marginTop: 25
   },
   modalContent: {
     flex: 1
@@ -304,8 +271,7 @@ const styles = {
     backgroundColor: '#fff',
     borderWidth: 0.5,
     borderColor: BORDER_COLOR,
-    //borderRadius: 10,
-},
+  },
 }
 
 function mapStateToProps({location, quiz, dendrologies }) {

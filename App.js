@@ -1,18 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar } from 'react-native';
+import { StyleSheet} from 'react-native';
 import {createStackNavigator, createBottomTabNavigator} from 'react-navigation';
 import {Provider} from 'react-redux';
 import { Icon } from 'react-native-elements';
 
 import store from './src/store';
 import AddScreen from './src/screens/AddScreen';
-import AuthScreen from './src/screens/AuthScreen';
 import DetailScreen from './src/screens/DetailScreen';
-import FilterScreen from './src/screens/FilterScreen';
 import MainScreen from './src/screens/MainScreen';
 import QuizScreen from './src/screens/QuizScreen';
-import ModalTester from './src/screens/Modal';
-import TestScreen from './src/screens/geolocationTest';
 import { MAIN_SCREEN, DETAIL_SCREEN, ADD_SCREEN, QUIZ_SCREEN } from './src/config/screen-routes';
 import QuizGuideScreen from './src/screens/QuizGuideScreen';
 import LearningScreen from './src/screens/LearningScreen';
