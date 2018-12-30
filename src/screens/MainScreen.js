@@ -123,7 +123,9 @@ class MainScreen extends Component {
     //FIXME: LATITUDE DELTA PARAMS MOVE TO CONSTANT
   _fetchClosestTree = () => {
     const [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
-    fetchClosestTree(latMin, latMax, lonMin, lonMax).then(
+    const currentLocation = this.props.currentLocation;
+
+    fetchClosestTree(latMin, latMax, lonMin, lonMax, currentLocation).then(
        ({id, latitude, longitude}) => {
        this._animateToMarker({latitude, longitude});
        this.refs['marker'+id].showCallout();
