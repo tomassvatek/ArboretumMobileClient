@@ -12,5 +12,6 @@ export const style = new StyleSheet.create({
     statusBar: {
         backgroundColor: PRIMARY_DARK_COLOR,
         height: Constants.statusBarHeight,
-    }
+    },
+
 })

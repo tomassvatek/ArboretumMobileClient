@@ -1,21 +1,24 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Text, View } from 'react-native';
 import PropTypes from 'prop-types';
 
-class Scoreboard extends Component {
-  render() {
-    return (
-      <View style={styles.containerStyle}>
-        <Text style={styles.correctStyle}>
-            Správně: {this.props.correct}
-        </Text>
-        <Text style={styles.totalStyle}>
-            Zbývá: {this.props.total}
-        </Text>
-      </View>
-    )
-  }
-}
+const Scoreboard = ({correct, total}) => 
+    <View style={styles.containerStyle}>
+      <Text style={styles.correctStyle}>
+          Správně: {correct}
+      </Text>
+      <Text style={styles.totalStyle}>
+          Zbývá: {total}
+      </Text>
+    </View>
+
+// Scoreboard.propTypes = {
+//     correct: PropTypes.number.isRequired,
+//     total: PropTypes.number.isRequired
+// }
+
+export default Scoreboard;
+
 
 const styles = {
     containerStyle: {
@@ -35,10 +38,3 @@ const styles = {
     }
 }
 
-Scoreboard.propTypes = {
-    correct: PropTypes.number.isRequired,
-    total: PropTypes.isRequired
-}
-
-
-export default Scoreboard;

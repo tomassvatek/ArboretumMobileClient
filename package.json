@@ -11,19 +11,20 @@
   "dependencies": {
     "@mapbox/polyline": "^1.0.0",
     "axios": "^0.18.0",
-    "expo": "^30.0.1",
+    "expo": "^30.0.2",
     "geolib": "^2.0.24",
-    "qs": "^6.5.2",
+    "qs": "^6.6.0",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-autocomplete-input": "^3.6.0",
     "react-native-elements": "^0.19.1",
     "react-native-floating-action": "^1.13.0",
     "react-native-map-clustering": "^1.3.0",
+    "react-native-maps-cluster": "^0.3.1",
     "react-native-modal": "^6.5.0",
-    "react-navigation": "^2.14.2",
-    "react-redux": "^5.0.7",
-    "redux": "^4.0.0",
+    "react-navigation": "^2.18.3",
+    "react-redux": "^5.1.1",
+    "redux": "^4.0.1",
     "redux-thunk": "^2.3.0"
   }
 }

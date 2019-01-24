@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import MapWithClustering  from 'react-native-map-clustering';
 
 import * as config from '../config';
-import MapView from 'react-native-maps';
 
 export default class Map extends Component {
 
@@ -27,23 +26,31 @@ export default class Map extends Component {
     this.mapClusterRef.root.animateToCoordinate(camera, duration);
   }
 
+  sayHello = () => {
+    console.log('helo');
+  }
+
   render() {
     return (
       <View style={{flex:1}}>
-        <MapView
+        <MapWithClustering
           ref={(ref) => this.mapClusterRef = ref}
           style={this.props.mapStyle} 
           region={this.props.region}
           showsUserLocation={this.props.showsUserLocation}
           followsUserLocation={this.props.followsUserLocation}
+          clustering={this.props.clustering}
+          clusterTextColor={config.PRIMARY_COLOR}
+          clusterBorderColor={config.PRIMARY_COLOR}
           onRegionChange={this.props.onRegionChange}
           onRegionChangeComplete={this.props.onRegionChangeComplete}
           onUserLocationChange={this.props.onUserLocationChange}
-          onCalloutPress={this.props.onCalloutPress} 
+          onCalloutPress={this.props.onCalloutPress}
+          showsMyLocationButton={false} 
         >
           {this.props.renderMarkers}
           {this.props.renderPolyline}
-        </MapView>
+        </MapWithClustering>
 
         <View style={this.props.overlayMapStyle}>
           {this.props.children()}
@@ -58,6 +65,7 @@ Map.propTypes = {
   //initialRegion: PropTypes.object,
   showsUserLocation: PropTypes.bool,
   followsUserLocation: PropTypes.bool,
+  clustering: PropTypes.bool,
   onRegionChange: PropTypes.func,
   onRegionChangeComplete: PropTypes.func,
   onUserLocationChange: PropTypes.func,

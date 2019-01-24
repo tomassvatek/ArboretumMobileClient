@@ -5,7 +5,7 @@ import {
 import {
     USER_LOCATION_CHANGE_FAILURE,
     USER_LOCATION_CHANGE_SUCCESS
-} from './redux-action-types';
+} from './const/redux-action-types';
 
 /**
  * Get current user location.

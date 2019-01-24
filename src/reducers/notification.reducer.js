@@ -3,7 +3,7 @@ import {
     INTERNET_CONNECTION_LOST,
     SHOW_NOTIFICATION,
     DISMISS_NOTIFICATION
-} from "../actions/redux-action-types";
+} from "../actions/const/redux-action-types";
 
 export default function (state = {}, action) {
     switch (action.type) {

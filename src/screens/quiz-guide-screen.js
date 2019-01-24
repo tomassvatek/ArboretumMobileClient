@@ -25,7 +25,8 @@ class QuizGuideScreen extends Component {
     _onSlidesComplete = () => {
         this._fetchQuizTrees((data) => {
             if(data.length == this.state.count) {
-                this.props.navigation.navigate(QUIZ_SCREEN, {
+                console.log("true");
+                this.props.navigation.navigate('quiz_screen', {
                     treeCount: this.state.count
                 });
             } else {
@@ -35,13 +36,18 @@ class QuizGuideScreen extends Component {
     }
 
     _fetchQuizTrees = callback => {
-        console.log(this.props.region);
-        const [lonMin, latMin, lonMax, latMax ] = getBoundingBox(this.props.region);
-        this.props.fetchQuizTrees(latMin, latMax, lonMin, lonMax, this.state.count,
+        const boundingBox = getBoundingBox(this.props.region);
+        const userLocation = this.props.currentLocation;
+        const count = this.state.count;
+
+        this.props.fetchQuizTrees(count, boundingBox, userLocation,
           (data) => callback(data)
         );
     }
 
+     /**
+      * Dropdown value changes.
+      */
       _onValueChange = (itemValue) => {
         this.setState({
             count: itemValue,
@@ -139,10 +145,10 @@ const styles = {
 };
 
 function mapStateToProps({quiz, location}) {
-    console.log(quiz);
     return {
       trees: quiz,
-      region: location.currentRegion
+      region: location.currentRegion,
+      currentLocation: location.currentLocation
     };
   }
 

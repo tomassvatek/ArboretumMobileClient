@@ -1,4 +1,4 @@
-import { CONNECTION_STATUS_CHANGE } from "./redux-action-types";
+import { CONNECTION_STATUS_CHANGE } from "./const/redux-action-types";
 
 export const changeConnectionStatus = (status) => dispatch => {
     console.log(`Connection status changed to ${status}`);

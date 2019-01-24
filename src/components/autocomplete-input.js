@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import {Icon} from 'react-native-elements';
 import Autocomplete  from 'react-native-autocomplete-input';
-import { INPUT_PLACEHOLDER_COLOR, PRIMARY_COLOR } from '../config';
+import { INPUT_PLACEHOLDER_COLOR } from '../config';
 import * as styles from '../styles/autocomplete-input.style';
 
 class AutocompleteInput extends Component {
@@ -33,7 +33,6 @@ class AutocompleteInput extends Component {
       typeof this.props.onChangeText === 'function' && this.props.onChangeText(value);
   }
 
-  //TODO: check if funkce byla vlozena
   _onItemPress = (item) => {
       this.setState({
           currentItem: item,
@@ -106,7 +105,6 @@ AutocompleteInput.propTypes = {
     autocompleteItems: PropTypes.array.isRequired,
     filterProperty: PropTypes.string.isRequired,
     displayProperty: PropTypes.string.isRequired,
-    // query: PropTypes.object,
     itemsCount: PropTypes.number,
     placeholder: PropTypes.string,
     iconButton: PropTypes.bool,

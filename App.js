@@ -5,13 +5,13 @@ import {Provider} from 'react-redux';
 import { Icon } from 'react-native-elements';
 
 import store from './src/store';
-import AddScreen from './src/screens/AddScreen';
-import DetailScreen from './src/screens/DetailScreen';
-import MainScreen from './src/screens/MainScreen';
-import QuizScreen from './src/screens/QuizScreen';
+import AddScreen from './src/screens/add-screen';
+import DetailScreen from './src/screens/detail-screen';
+import MainScreen from './src/screens/main-screen';
+import QuizScreen from './src/screens/quiz-screen';
 import { MAIN_SCREEN, DETAIL_SCREEN, ADD_SCREEN, QUIZ_SCREEN } from './src/config/screen-routes';
-import QuizGuideScreen from './src/screens/QuizGuideScreen';
-import LearningScreen from './src/screens/LearningScreen';
+import QuizGuideScreen from './src/screens/quiz-guide-screen';
+import LearningScreen from './src/screens/learning-screen';
 
 
 export default class App extends React.Component {

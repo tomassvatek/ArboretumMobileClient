@@ -1,4 +1,4 @@
-import { FETCH_TREE_DETAIL } from "../actions/redux-action-types";
+import { FETCH_TREE_DETAIL } from "../actions/const/redux-action-types";
 
 export default function(state = {}, action) {
     switch(action.type) {

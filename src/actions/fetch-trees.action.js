@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FETCH_TREES } from './redux-action-types';
+import { FETCH_TREES } from './const/redux-action-types';
 import { replaceStringPlaceholders } from '../utils/replace-string-placeholders';
 import { GET_TREES_EDNPOINT } from '../services/http/constants';
 

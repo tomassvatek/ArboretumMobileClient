@@ -1,44 +1,57 @@
 import React, { Component } from 'react'
 import { Platform, View, ActivityIndicator, NetInfo, StatusBar } from 'react-native'
-import { MapView } from 'expo';
+import { MapView, Constants } from 'expo';
 import { FloatingAction } from 'react-native-floating-action';
 import { connect } from 'react-redux';
-import * as statusBar from '../styles/status-bar.style';
 import { NavigationEvents } from 'react-navigation';
 
-import Map from '../components/custom-map';
+import Map from '../components/clustering-map';
 import AutocompleteInput from '../components/autocomplete-input';
 import Notification from '../components/notification';
-
 import { getBoundingBox, getPolylineCoordinates } from '../utils';
 import { fetchClosestTree, fetchClosestTreeByDendrology } from '../services/http';
 import { DETAIL_SCREEN, ADD_SCREEN, QUIZ_GUIDE_SCREEN } from '../config/screen-routes';
-import { NAVIGATE_USER } from '../actions/redux-action-types';
+import { NAVIGATE_USER } from '../actions/const/redux-action-types';
 import * as actions from '../actions';
 import * as fab from '../helpers/fab';
-import { ERROR_COLOR, NOTIFICATION_BASE_COLOR, SECONDARY_COLOR, PRIMARY_COLOR } from '../config';
+import { ERROR_COLOR, NOTIFICATION_BASE_COLOR, SECONDARY_COLOR, PRIMARY_COLOR, PRIMARY_DARK_COLOR } from '../config';
 import { INTERNET_CONNECTION_LOST_MESSAGE, TREE_NAVIGATION_CANCEL_MESSAGE } from '../services/notification/notification-messages';
-import { INTERNET_CONNECTION_LOST } from '../actions/redux-action-types';
 import { TREE_NAVIGATION_CANCEL } from '../services/notification/notification-types';
-import * as modal from '../styles/modal.style';
 import strings from '../res/strings';
-import { colors } from 'react-native-elements';
 
+const API_CALL_RATE = 3500;
 
 class MainScreen extends Component {
   static navigationOptions = {
     header: null,
-    title: strings.screenTitles.mainScreen,
-    statusBarStyle: 'light-content',
+    title: strings.screenTitles.mainScreen
   }
 
   state = {
     polylineCoordinates: [],
-    currentCallout: null
+    currentCallout: null,
+    lastApiCall: 0,
+    apiCallEnable: true
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(this.props.trees.length !== nextProps.trees.length ||
+       this.props.notification !== nextProps.notification || 
+       this.state.polylineCoordinates !== nextState.polylineCoordinates ||
+       this.state.currentCallout !== nextState.currentCallout
+       ) 
+    {
+      // console.log("change");
+      return true;
+    }
+    
+    // console.log("not change");
+    return false;
   }
 
   componentDidMount() {
     NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionStatusChange);
+
     if(Platform.OS === 'android') {
       this.props.getUserLocation(() => { 
         this._fetchTrees();
@@ -49,14 +62,13 @@ class MainScreen extends Component {
   }
 
   componentWillUnmount() {
-    console.log("MainScreen unmount");
     NetInfo.isConnected.removeEventListener('connectionChange', this._handleConnectionStatusChange);
   }
 
   /**
    * React navigation lifecycle metohd.
    */
-  componentWillFocus(payload) {
+  async componentWillFocus(payload) {
     const { action } = payload;
 
     const { params } = action;
@@ -67,21 +79,21 @@ class MainScreen extends Component {
       
     switch(actionName) {
       case NAVIGATE_USER:
-        this._startNavigationMode();
+        await this._startNavigationMode();
         break;
     }
   }
 
-  _startNavigationMode = () => {
+  _startNavigationMode = async () => {
     const { latitude, longitude } = this.state.currentCallout;
-    this._fetchNavigationRoad({latitude, longitude});
+    await this._fetchNavigationRoad({latitude, longitude});
     this.props.showNotification({
       type: TREE_NAVIGATION_CANCEL,
       color: NOTIFICATION_BASE_COLOR,
       message: TREE_NAVIGATION_CANCEL_MESSAGE
     });
 
-    this._animateToMarker(this.props.currentLocation);
+    //this._animateToMarker(this.props.currentLocation);
   }
 
   _animateToMarker = ({latitude, longitude}) => {
@@ -91,28 +103,25 @@ class MainScreen extends Component {
       latitudeDelta: 0.001,
       longitudeDelta: 0.001
     }
+
     this.mapRef.animateToRegion(regionToAnimate);
   }
 
   _watchPositionAsync = () => {
     this.props.watchPosition(20, (coordinate) => {
          this._fetchTrees();
-         this.mapRef && this.mapRef.animateToRegion(this.props.region);
+         //this.mapRef && this.mapRef.animateToRegion(this.props.region);
     });
   }
 
-  //FIXME: Vykreslí se až po druhém setState
-  // Initial state?
-  _fetchNavigationRoad = (destination) => {
-    getPolylineCoordinates(this.props.currentLocation, destination)
-    .then(
-      (polylineCoordinates) => {
-        this.setState({polylineCoordinates}, () => {
-          this.setState(polylineCoordinates)
-        })
-      },
-      (error) => console.log(error)
-    )
+  _fetchNavigationRoad = async (destination) => {
+    try {
+      const location = this.props.currentLocation;
+      const polylineCoordinates = await getPolylineCoordinates(location, destination);
+      this.setState({polylineCoordinates}, () => console.log(this.state.polylineCoordinates));
+    } catch(err) {
+        (error) => console.log(error)
+    }
   }
 
   _fetchTrees = () => {
@@ -146,7 +155,6 @@ class MainScreen extends Component {
       fetchClosestTreeByDendrology(commonName, latMin, latMax, lonMin, lonMax, currentLocation).then(
         ({id, latitude, longitude}) => {
           this._animateToMarker({latitude, longitude});
-          this.mapRef.animateToRegion(regionToAnimate);
           this.refs['marker'+id].showCallout();
         },
         (error) => console.log(error)
@@ -158,7 +166,18 @@ class MainScreen extends Component {
   _resetTreeNavigation = () => { 
     this.setState({currentCallout: null, polylineCoordinates: []}, () => this.setState({polylineCoordinates: []}));
     this.props.dismissNotification();
-  };
+  }
+
+  _setRegion = region => {
+    this.setState({lastApiCall: Date.now() - API_CALL_RATE });
+
+    this.props.regionChange(region, () => {
+      if(Date.now() - this.state.lastApiCall >= API_CALL_RATE) {
+        this._fetchTrees();
+        this.setState({lastApiCall: Date.now()});
+      }
+    });
+  }
 
   _handleConnectionStatusChange = (isConnected) => {
     this.props.changeConnectionStatus(isConnected);
@@ -199,7 +218,6 @@ class MainScreen extends Component {
         this._handleFabItemNearestPress();
         break;
       default:
-        console.error('None fab item selected');
         break;
     }
   }
@@ -211,6 +229,7 @@ class MainScreen extends Component {
   _handleFabItemMyPositionPress = () => {
     const { latitude, longitude } = this.props.currentLocation;
     this._animateToMarker({latitude, longitude});
+    //this.setState({apiCallEnable: false});
   }
  
   _handleFabItemNearestPress = () => {
@@ -225,7 +244,6 @@ class MainScreen extends Component {
     switch(this.props.notification.type) {
       case TREE_NAVIGATION_CANCEL:
         this._resetTreeNavigation();
-        //this.props.dismissNotification();
         break;
     }
   }
@@ -275,44 +293,50 @@ class MainScreen extends Component {
   }
 
   render() {
-    if(!this._isReadyToRender()) {
-      return (
-        <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size='large' />
-        </View>
-      )
-    }
+    // if(!this._isReadyToRender()) {
+    //   return (
+    //     <View style={[styles.containerStyle, { justifyContent: 'center', alignItems: 'center' }]}>
+    //       <ActivityIndicator size='large' />
+    //     </View>
+    //   )
+    // }
     return (
       <View style={{flex:1}}>
         <NavigationEvents
           onWillFocus={payload => this.componentWillFocus(payload)}
         />
+        <View style={styles.statusBar}></View>
         <View style={styles.containerStyle}>
-          <View style={statusBar.style.statusBar}></View>
           <Notification 
-            isVisible={this.props.notification.message}
+            isVisible={this.props.notification.message ? true : false}
             notificationStyle={{backgroundColor: this.props.notification.color}}
             notificationMessage={this.props.notification.message}
             textColor="#fff"
             onNotificationPress={this._handleNotificationPress}
-            />
+          />
+
           <Map
             onRef={(ref) => this.mapRef = ref}
             mapStyle={styles.mapStyle}
             overlayMapStyle={styles.overlayMapStyle}
             region={this.props.region}
+            clustering={true}
             showsUserLocation
             followUserLocation
+            onRegionChangeComplete={this._setRegion}
             onCalloutPress={(event) => this._handleCalloutPress(event)}
             renderMarkers={ this._renderMarkers(this.props.trees)}
             renderPolyline={this._renderPolyline()}
           >
             {this._renderOverlay}
           </Map>
+
           <FloatingAction 
             color={PRIMARY_COLOR}
             actions={fab.FAB_ACTIONS}
-            onPressItem={name => this._handleFabItemPress(name)}/>
+            onPressItem={name => this._handleFabItemPress(name)}
+          />
+
         </View>
       </View>
     )
@@ -342,12 +366,15 @@ const styles = {
     borderRadius: 10,
     backgroundColor: '#fff'
 },
+
+statusBar: {
+  backgroundColor: PRIMARY_DARK_COLOR,
+  height: Constants.statusBarHeight,
+},
 }
 
 function mapStateToProps(state) {
-  console.log(`${Date.now()} trees update`);
-  // console.log(state.trees);
-  return { 
+  return {
     currentLocation: state.location.currentLocation,
     trees: state.trees,
     dendrologies: state.dendrologies,

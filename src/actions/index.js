@@ -5,3 +5,4 @@ export * from './fetch-quiz.action';
 export * from './fetch-dendrologies.action';
 export * from './network-connection.action';
 export * from './notification.action';
+export * from './region-change.action';

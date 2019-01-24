@@ -8,7 +8,7 @@ import Modal from 'react-native-modal';
 import AutocompleteInput from '../components/autocomplete-input';
 import * as actions from '../actions';
 import * as modal from '../styles/modal.style';
-import { getPolylineCoordinates, getBoundingBox, calculateDistance } from '../utils';
+import { getPolylineCoordinates, calculateDistance } from '../utils';
 import ScoreBoard from '../components/scoreboard';
 import Map from '../components/custom-map';
 import { PRIMARY_DARK_COLOR, BORDER_COLOR, SECONDARY_COLOR } from '../config';
@@ -37,8 +37,8 @@ class QuizScreen extends Component {
     count: this.props.navigation.getParam('treeCount')
   }
 
-  componentDidMount() {
-    this._startQuiz();
+  async componentDidMount() {
+    await this._startQuiz();
     this._watchPositionAsync();
   }
 
@@ -54,20 +54,19 @@ class QuizScreen extends Component {
     })
   }
 
-  _startQuiz = () => {
+  _startQuiz = async () => {
     if(this.state.index <= this.props.trees.length - 1) {
-      this.setState({destination: this.props.trees[this.state.index]}, () => 
+      this.setState({destination: this.props.trees[this.state.index]}, async () => 
       {
           const destinationLatLng = {
             latitude: this.state.destination.latitude, 
             longitude: this.state.destination.longitude
           };
-
-          getPolylineCoordinates(this.props.location, destinationLatLng).then(polylineCoordinates => 
-            this.setState({
-              polylineCoordinates
-            }, ()  => this._incrementIndex())
-         )
+          const location = this.props.location;
+          
+          const polylineCoordinates = await getPolylineCoordinates(location, destinationLatLng);
+          this.setState({polylineCoordinates});
+          this._incrementIndex();
       })
     }
   }
@@ -96,18 +95,10 @@ class QuizScreen extends Component {
     )
   }
 
-
-//TODO: Pripad ze neni odpoved spravna
   _updateScore = () => {
-    if (this._evualateAnswer()) {
-      this._handleCorrectAnswer();
-    } 
-    else {
-      this._handleWrongAnswer();
-    }
-    this.setState({
-      isModalVisible: false
-    });
+    const isAnwerCorrect = this._isAnswerCorrect();
+    isAnwerCorrect ? this._handleCorrectAnswer() : this._handleWrongAnswer();
+    this._closeModal();
   }
 
   _handleCorrectAnswer = () => {
@@ -143,19 +134,19 @@ class QuizScreen extends Component {
      }
   }
 
-  _evualateAnswer = () => {
+  _isAnswerCorrect = () => {
     const correctAnswer = this.state.destination.commonName.toLowerCase();
     const userAnswer = this.state.answer.commonName.toLowerCase();
-
     const result = userAnswer == correctAnswer ? true : false;
     return result;
   }
+
 
   _onItemPress = (item) => {
     this.setState({answer: item, isButtonVisible: true});
   }
 
-  onChangeText = (value) => {
+  _onChangeText = (value) => {
     this.setState({isButtonVisible: false});
   }
 
@@ -176,7 +167,7 @@ class QuizScreen extends Component {
             displayProperty="commonName"
             placeholder="Zadej odpověď"
             onItemPress={(item) => this._onItemPress(item)}
-            onChangeText={(value) => this.onChangeText(value)}
+            onChangeText={(value) => this._onChangeText(value)}
           />
         </View>
         {this.state.isButtonVisible &&  
@@ -190,6 +181,12 @@ class QuizScreen extends Component {
       </View>
       </Modal>
     )
+  }
+
+  _closeModal = () => {
+    this.setState({
+      isModalVisible: false
+    });
   }
 
   _renderQuizEnd = () => {

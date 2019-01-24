@@ -19,7 +19,6 @@ class Slides extends Component {
     }
 
     renderSlides() {
-        const length = this.props.data.length;
         return this.props.data.map((slide, i)=> {
             return (
                 <View key={slide.text} 

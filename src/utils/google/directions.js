@@ -13,8 +13,11 @@ const GOOGLE_API_KEY = 'AIzaSyAeTR9DniCDMtCLdcYKtZ-TUH3JSPFVjuY';
  */
 export const getPolylineCoordinates = async (origin, destination) => {
     try {
+        console.log(origin, destination);
         const url = buildDirectionsUrl(origin, destination);
+        console.log(url);
         let { data } = await axios.get(url);
+
         let points = Polyline.decode(data.routes[0].overview_polyline.points);
         let coords = points.map(point => {
             return {
@@ -22,7 +25,6 @@ export const getPolylineCoordinates = async (origin, destination) => {
                 longitude: point[1]
             }
         })
-
         return coords;
 
     } catch(err) {
@@ -44,5 +46,6 @@ const buildDirectionsUrl = (origin, destination) => {
         mode: travelMode, 
         key: GOOGLE_API_KEY  
     });
+    
     return `${DIRECTIONS_ROOT_URL}${query}`;
 }

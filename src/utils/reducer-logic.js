@@ -3,8 +3,9 @@
  * @param {*} originArray 
  * @param {*} arrayToAdd 
  */
-export const addArrayWithouDuplicate = (sourceArray, arrayToAdd ) => {
+export const addArrayWithoutDuplicate = (sourceArray, arrayToAdd ) => {
     const result = [];
+
     arrayToAdd.forEach(item => {
         const elementExits = sourceArray.filter(element => element.id === item.id);
         if (elementExits.length === 0) {

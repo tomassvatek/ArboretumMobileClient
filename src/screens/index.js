@@ -1,3 +1,3 @@
 export { AddScreen } from "./AddScreen";
-export { MainScreen } from './MainScreen';
-export { QuizScreen } from './QuizScreen';
+export { MainScreen } from './main-screen';
+export { QuizScreen } from './quiz-screen';

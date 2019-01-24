@@ -38,7 +38,7 @@ class LearningScreen extends Component {
         title={item.commonName}
       >
         <Text 
-          style={{marginBottom: 10, fontSize: 14,  lineHeight: 25}}>
+          style={{marginBottom: 10, fontSize: 14,  lineHeight: 25, height: 325}}>
             {item.about}
         </Text>
       </Card>
@@ -64,7 +64,6 @@ class LearningScreen extends Component {
     return (
      <View style={styles.container}>
      <View style={statusBar.style.statusBar}></View>
-
         <Deck
           data={this.state.dendrologies}
           renderCard={this.renderCard}
@@ -78,7 +77,7 @@ class LearningScreen extends Component {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#fff'
+      backgroundColor: '#33A9F4'
     },
   });
 
